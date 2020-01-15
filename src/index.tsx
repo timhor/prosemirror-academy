@@ -9,22 +9,30 @@ import { EditorDispatch, EditorContextType } from './types';
 import './index.css';
 
 const emptyEditorDispatch: EditorDispatch = tr => {};
-const { Consumer: EditorConsumer, Provider: EditorProvider } = createContext<EditorContextType>({
+const { Consumer: EditorConsumer, Provider: EditorProvider } = createContext<
+  EditorContextType
+>({
   editorState: null,
   editorDispatch: emptyEditorDispatch,
 });
+const plugins = createPluginList({
+  schema,
+});
 
 const App = () => {
-  const [editorState, setEditorState] = React.useState<EditorState | null>(null);
-  const [editorDispatch, setEditorDispatch] = React.useState<EditorDispatch>(emptyEditorDispatch);
+  const [editorState, setEditorState] = React.useState<EditorState | null>(
+    null,
+  );
+  const [editorDispatch, setEditorDispatch] = React.useState<EditorDispatch>(
+    emptyEditorDispatch,
+  );
   const ref = useRef<HTMLDivElement>(document.createElement('div'));
 
   useEffect(() => {
     const target = ref.current;
-
     const { state, dispatch } = new EditorView(target, {
       state: EditorState.create({
-        plugins: createPluginList(),
+        plugins,
         schema,
       }),
       dispatchTransaction(tr) {
@@ -52,11 +60,16 @@ const App = () => {
               return null;
             }
 
-            return <MenuBar editorState={editorState} editorDispatch={editorDispatch} />;
+            return (
+              <MenuBar
+                editorState={editorState}
+                editorDispatch={editorDispatch}
+              />
+            );
           }}
         </EditorConsumer>
-        <div id="editor" ref={ref} />
       </EditorProvider>
+      <div id="editor" ref={ref} />
     </div>
   );
 };

@@ -1,11 +1,10 @@
 import React, { useCallback } from 'react';
-import { EditorDispatch } from '../types';
+import { EditorContextType } from '../types';
 import { toggleMark } from 'prosemirror-commands';
 import { EditorState } from 'prosemirror-state';
 
-type MenuBarProps = {
+type MenuBarProps = EditorContextType & {
   editorState: EditorState<any>;
-  editorDispatch: EditorDispatch;
 };
 
 const MenuBar = ({ editorState, editorDispatch }: MenuBarProps) => {
