@@ -1,27 +1,64 @@
-import React, { useRef, useEffect } from 'react';
+import React, { createContext, useRef, useEffect } from 'react';
 import { EditorView } from 'prosemirror-view';
-import { EditorState } from 'prosemirror-state';
+import { EditorState, Transaction } from 'prosemirror-state';
 import ReactDOM from 'react-dom';
+import MenuBar from './ui/MenuBar';
 import { createPluginList } from './plugins';
 import { schema } from './schema';
+import { EditorDispatch, EditorContextType } from './types';
 import './index.css';
 
+const emptyEditorDispatch: EditorDispatch = tr => {};
+const { Consumer: EditorConsumer, Provider: EditorProvider } = createContext<EditorContextType>({
+  editorState: null,
+  editorDispatch: emptyEditorDispatch,
+});
+
 const App = () => {
-  const ref = useRef<HTMLDivElement>(null);
+  const [editorState, setEditorState] = React.useState<EditorState | null>(null);
+  const [editorDispatch, setEditorDispatch] = React.useState<EditorDispatch>(emptyEditorDispatch);
+  const ref = useRef<HTMLDivElement>(document.createElement('div'));
 
   useEffect(() => {
-    if (ref && ref.current) {
-      const target = ref.current;
-      new EditorView(target, {
-        state: EditorState.create({
-          plugins: createPluginList(),
-          schema,
-        }),
-      });
-    }
+    const target = ref.current;
+
+    const { state, dispatch } = new EditorView(target, {
+      state: EditorState.create({
+        plugins: createPluginList(),
+        schema,
+      }),
+      dispatchTransaction(tr) {
+        const editorView = this;
+
+        if (editorView instanceof EditorView) {
+          const newEditorState = editorView.state.apply(tr);
+
+          editorView.updateState(newEditorState);
+          setEditorState(newEditorState);
+        }
+      },
+    });
+
+    setEditorDispatch(() => dispatch);
+    setEditorState(state);
   }, [ref]);
 
-  return <div id="editor" ref={ref} />;
+  return (
+    <div>
+      <EditorProvider value={{ editorState, editorDispatch }}>
+        <EditorConsumer>
+          {({ editorState, editorDispatch }) => {
+            if (!editorState) {
+              return null;
+            }
+
+            return <MenuBar editorState={editorState} editorDispatch={editorDispatch} />;
+          }}
+        </EditorConsumer>
+        <div id="editor" ref={ref} />
+      </EditorProvider>
+    </div>
+  );
 };
 
 ReactDOM.render(<App />, document.getElementById('root'));
