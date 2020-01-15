@@ -1,4 +1,4 @@
-import {Schema, NodeSpec, MarkSpec} from 'prosemirror-model';
+import { Schema, NodeSpec, MarkSpec } from 'prosemirror-model';
 
 const pDOM = ['p', 0];
 
@@ -21,6 +21,10 @@ export const nodes: NodeSpec = {
     },
   },
 
+  // :: NodeSpec The text node.
+  text: {
+    group: 'inline',
+  },
 };
 
 const strongDOM = ['strong', 0];
@@ -29,19 +33,17 @@ const strongDOM = ['strong', 0];
 export const marks: MarkSpec = {
   strong: {
     parseDOM: [
-      {tag: 'strong'},
+      { tag: 'strong' },
       // This works around a Google Docs misbehavior where
       // pasted content will be inexplicably wrapped in `<b>`
       // tags with a font-weight normal.
       {
         tag: 'b',
-        getAttrs: (node: HTMLElement) =>
-          node.style.fontWeight != 'normal' && null,
+        getAttrs: (node: HTMLElement) => node.style.fontWeight !== 'normal' && null,
       },
       {
         style: 'font-weight',
-        getAttrs: (value: string) =>
-          /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null,
+        getAttrs: (value: string) => /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null,
       },
     ],
     toDOM() {
@@ -58,4 +60,4 @@ export const marks: MarkSpec = {
 //
 // To reuse elements from this schema, extend or read from its
 // `spec.nodes` and `spec.marks` [properties](#model.Schema.spec).
-export const schema = new Schema({nodes, marks});
+export const schema = new Schema({ nodes, marks });
