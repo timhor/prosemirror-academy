@@ -1,6 +1,6 @@
 import React, { createContext, useRef, useEffect } from 'react';
 import { EditorView } from 'prosemirror-view';
-import { EditorState, Transaction } from 'prosemirror-state';
+import { EditorState } from 'prosemirror-state';
 import ReactDOM from 'react-dom';
 import MenuBar from './ui/MenuBar';
 import { createPluginList } from './plugins';

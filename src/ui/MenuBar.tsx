@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { EditorContextType, EditorDispatch } from '../types';
+import { EditorDispatch } from '../types';
 import { toggleMark } from 'prosemirror-commands';
 import { EditorState } from 'prosemirror-state';
 
