@@ -1,6 +1,10 @@
-import { Schema, NodeSpec, MarkSpec } from 'prosemirror-model';
-
-const pDOM = ['p', 0];
+// https://github.com/ProseMirror/prosemirror-schema-basic/blob/master/src/schema-basic.js
+import {
+  Schema,
+  NodeSpec,
+  MarkSpec,
+  Node as ProseMirrorNode,
+} from 'prosemirror-model';
 
 // :: Object
 // [Specs](#model.NodeSpec) for the nodes defined in this schema.
@@ -17,7 +21,25 @@ export const nodes: NodeSpec = {
     group: 'block',
     parseDOM: [{ tag: 'p' }],
     toDOM() {
-      return pDOM;
+      return ['p', 0];
+    },
+  },
+
+  // :: NodeSpec A heading textblock, with a `level` attribute that
+  // should hold the number 1 to 6. Parsed and serialized as `<h1>` to
+  // `<h6>` elements.
+  heading: {
+    attrs: { level: { default: 1 } },
+    content: 'inline*',
+    group: 'block',
+    defining: true,
+    parseDOM: [
+      { tag: 'h1', attrs: { level: 1 } },
+      { tag: 'h2', attrs: { level: 2 } },
+      { tag: 'h3', attrs: { level: 3 } },
+    ],
+    toDOM(node: ProseMirrorNode) {
+      return ['h' + node.attrs.level, 0];
     },
   },
 
@@ -39,11 +61,13 @@ export const marks: MarkSpec = {
       // tags with a font-weight normal.
       {
         tag: 'b',
-        getAttrs: (node: HTMLElement) => node.style.fontWeight !== 'normal' && null,
+        getAttrs: (node: HTMLElement) =>
+          node.style.fontWeight !== 'normal' && null,
       },
       {
         style: 'font-weight',
-        getAttrs: (value: string) => /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null,
+        getAttrs: (value: string) =>
+          /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null,
       },
     ],
     toDOM() {
