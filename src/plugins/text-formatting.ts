@@ -20,6 +20,7 @@ export const createTextFormattingPlugin = (): Plugin<StateField<
         return {
           strongDisabled: false,
           strongActive: false,
+          headingActive: null,
         };
       },
 

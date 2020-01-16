@@ -1,4 +1,4 @@
-// https://github.com/ProseMirror/prosemirror-schema-basic/blob/master/src/schema-basic.js
+// https://raw.githubusercontent.com/ProseMirror/prosemirror-schema-basic/master/src/schema-basic.js
 import {
   Schema,
   NodeSpec,
@@ -60,6 +60,17 @@ export const nodes: NodeSpec = {
     parseDOM: [{ tag: 'pre', preserveWhitespace: 'full' }],
     toDOM() {
       return ['pre', ['code', 0]];
+    },
+  },
+
+  // :: NodeSpec A hard line break, represented in the DOM as `<br>`.
+  hard_break: {
+    inline: true,
+    group: 'inline',
+    selectable: false,
+    parseDOM: [{ tag: 'br' }],
+    toDOM() {
+      return ['br'];
     },
   },
 };

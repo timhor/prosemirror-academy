@@ -56,6 +56,33 @@ const CodeBlockMenuItem = ({
   return <button onClick={onClick}>Code Block</button>;
 };
 
+const HeadingMenuItem = ({
+  editorView: { state, dispatch },
+  pluginsState,
+  level,
+}: MenuItem<TextFormattingPluginState> & { level: number }) => {
+  const onClick = useCallback(() => {
+    const {
+      schema: {
+        nodes: { heading },
+      },
+    } = state;
+
+    setBlockTypeInSelection(heading, { level })(state, dispatch);
+  }, [state, dispatch, level]);
+
+  const { headingActive = null } = pluginsState || {};
+
+  return (
+    <button
+      className={headingActive === level ? 'menu-item__active' : ''}
+      onClick={onClick}
+    >
+      H{level}
+    </button>
+  );
+};
+
 const MenuBar = ({ editorView, editorPluginStates }: MenuBarProps) => {
   const { textFormattingPluginState } = editorPluginStates;
 
@@ -68,6 +95,22 @@ const MenuBar = ({ editorView, editorPluginStates }: MenuBarProps) => {
       <CodeBlockMenuItem
         editorView={editorView}
         pluginsState={textFormattingPluginState}
+      />
+
+      <HeadingMenuItem
+        editorView={editorView}
+        pluginsState={textFormattingPluginState}
+        level={1}
+      />
+      <HeadingMenuItem
+        editorView={editorView}
+        pluginsState={textFormattingPluginState}
+        level={2}
+      />
+      <HeadingMenuItem
+        editorView={editorView}
+        pluginsState={textFormattingPluginState}
+        level={3}
       />
     </div>
   );

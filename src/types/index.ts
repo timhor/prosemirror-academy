@@ -5,6 +5,7 @@ import { EditorView } from 'prosemirror-view';
 export type TextFormattingPluginState = {
   strongDisabled: boolean;
   strongActive: boolean;
+  headingActive: number | null;
 };
 export type PluginState = TextFormattingPluginState;
 
