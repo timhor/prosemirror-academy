@@ -1,41 +1,74 @@
 import React, { useCallback } from 'react';
-import { EditorContextType } from '../types';
 import { toggleMark } from 'prosemirror-commands';
-import { EditorState } from 'prosemirror-state';
-import { isMarkActive } from '../utils';
+import { setBlockTypeInSelection } from '../commands';
+import { EditorView } from 'prosemirror-view';
+import { EditorContextType, TextFormattingPluginState } from '../types';
 
 type MenuBarProps = EditorContextType & {
-  editorState: EditorState<any>;
+  editorView: EditorView;
 };
 
-const BoldMenuItem = ({ editorState, editorDispatch }: MenuBarProps) => {
+type MenuItem<T> = {
+  editorView: EditorView;
+  pluginsState?: T;
+};
+
+const BoldMenuItem = ({
+  editorView: { state, dispatch },
+  pluginsState,
+}: MenuItem<TextFormattingPluginState>) => {
   const onClick = useCallback(() => {
     const {
       schema: {
         marks: { strong },
       },
-    } = editorState;
-    toggleMark(strong)(editorState, editorDispatch);
-  }, [editorState, editorDispatch]);
+    } = state;
+    toggleMark(strong)(state, dispatch);
+  }, [state, dispatch]);
 
-  const {
-    schema: {
-      marks: { strong },
-    },
-  } = editorState;
-  const isActive = isMarkActive(editorState, strong);
+  const { strongActive = false, strongDisabled = true } = pluginsState || {};
 
   return (
-    <button className={isActive ? 'menu-item__active' : ''} onClick={onClick}>
+    <button
+      disabled={strongDisabled}
+      className={strongActive ? 'menu-item__active' : ''}
+      onClick={onClick}
+    >
       BOLD
     </button>
   );
 };
 
-const MenuBar = ({ editorState, editorDispatch }: MenuBarProps) => {
+const CodeBlockMenuItem = ({
+  editorView: { state, dispatch },
+  pluginsState,
+}: MenuItem<TextFormattingPluginState>) => {
+  const onClick = useCallback(() => {
+    const {
+      schema: {
+        nodes: { code_block },
+      },
+    } = state;
+
+    setBlockTypeInSelection(code_block, {})(state, dispatch);
+  }, [state, dispatch]);
+
+  return <button onClick={onClick}>Code Block</button>;
+};
+
+const MenuBar = ({ editorView, editorPluginStates }: MenuBarProps) => {
+  const { textFormattingPluginState } = editorPluginStates;
+
   return (
-    <div>
-      <BoldMenuItem editorState={editorState} editorDispatch={editorDispatch} />
+    <div id="menu-bar">
+      <BoldMenuItem
+        editorView={editorView}
+        pluginsState={textFormattingPluginState}
+      />
+      <CodeBlockMenuItem
+        editorView={editorView}
+        pluginsState={textFormattingPluginState}
+      />
     </div>
   );
 };

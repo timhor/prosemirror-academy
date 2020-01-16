@@ -47,6 +47,21 @@ export const nodes: NodeSpec = {
   text: {
     group: 'inline',
   },
+
+  // :: NodeSpec A code listing. Disallows marks or non-text inline
+  // nodes by default. Represented as a `<pre>` element with a
+  // `<code>` element inside of it.
+  code_block: {
+    content: 'text*',
+    marks: '',
+    group: 'block',
+    code: true,
+    defining: true,
+    parseDOM: [{ tag: 'pre', preserveWhitespace: 'full' }],
+    toDOM() {
+      return ['pre', ['code', 0]];
+    },
+  },
 };
 
 const strongDOM = ['strong', 0];
@@ -72,6 +87,13 @@ export const marks: MarkSpec = {
     ],
     toDOM() {
       return strongDOM;
+    },
+  },
+
+  em: {
+    parseDOM: [{ tag: 'i' }, { tag: 'em' }, { style: 'font-style=italic' }],
+    toDOM() {
+      return ['em', 0];
     },
   },
 };

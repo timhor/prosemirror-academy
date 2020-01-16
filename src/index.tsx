@@ -1,19 +1,18 @@
-import React, { createContext, useRef, useEffect } from 'react';
+import React, { useState, createContext, useRef, useEffect } from 'react';
 import { EditorView } from 'prosemirror-view';
 import { EditorState } from 'prosemirror-state';
 import ReactDOM from 'react-dom';
 import MenuBar from './ui/MenuBar';
-import { createPluginList } from './plugins';
+import { createPluginList, buildEditorPluginStates } from './plugins';
 import { schema } from './schema';
-import { EditorDispatch, EditorContextType } from './types';
+import { EditorPluginStates, EditorContextType } from './types';
 import './index.css';
 
-const emptyEditorDispatch: EditorDispatch = tr => {};
 const { Consumer: EditorConsumer, Provider: EditorProvider } = createContext<
   EditorContextType
 >({
-  editorState: null,
-  editorDispatch: emptyEditorDispatch,
+  editorView: null,
+  editorPluginStates: {},
 });
 const plugins = createPluginList({
   schema,
@@ -24,50 +23,62 @@ const EditorComponent = ({
 }: {
   editorRef: React.RefObject<HTMLDivElement>;
 }) => {
-  const [editorState, setEditorState] = React.useState<EditorState | null>(
-    null,
-  );
-  const [editorDispatch, setEditorDispatch] = React.useState<EditorDispatch>(
-    emptyEditorDispatch,
-  );
+  const [editorPluginStates, setEditorPluginStates] = useState<
+    EditorPluginStates
+  >({});
+
+  const editorView = React.useRef<EditorView | null>(null);
 
   useEffect(() => {
     if (editorRef && editorRef.current) {
       const target = editorRef.current;
-      const { state, dispatch } = new EditorView(target, {
+      editorView.current = new EditorView(target, {
         state: EditorState.create({
           plugins,
           schema,
         }),
         dispatchTransaction(tr) {
-          const editorView = this;
+          if (editorView.current) {
+            const newEditorState = editorView.current.state.apply(tr);
 
-          if (editorView instanceof EditorView) {
-            const newEditorState = editorView.state.apply(tr);
+            editorView.current.updateState(newEditorState);
 
-            editorView.updateState(newEditorState);
-            setEditorState(newEditorState);
+            setEditorPluginStates(
+              buildEditorPluginStates(newEditorState, plugins),
+            );
           }
         },
       });
 
-      setEditorDispatch(() => dispatch);
-      setEditorState(state);
+      setEditorPluginStates(
+        buildEditorPluginStates(editorView.current.state, plugins),
+      );
+
+      return () => {
+        if (editorView.current) {
+          editorView.current.destroy();
+        }
+      };
     }
   }, [editorRef]);
 
   return (
-    <EditorProvider value={{ editorState, editorDispatch }}>
+    <EditorProvider
+      value={{
+        editorPluginStates,
+        editorView: editorView.current,
+      }}
+    >
       <EditorConsumer>
-        {({ editorState, editorDispatch }) => {
-          if (!editorState) {
+        {({ editorView, editorPluginStates }) => {
+          if (!editorView) {
             return null;
           }
 
           return (
             <MenuBar
-              editorState={editorState}
-              editorDispatch={editorDispatch}
+              editorView={editorView}
+              editorPluginStates={editorPluginStates}
             />
           );
         }}
