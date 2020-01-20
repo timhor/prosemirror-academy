@@ -15,6 +15,7 @@ export const createTextFormattingPlugin = (): Plugin<StateField<
   TextFormattingPluginState
 >> => {
   return new Plugin({
+    key: pluginKey,
     state: {
       init(_config, state: EditorState): TextFormattingPluginState {
         return {
@@ -47,6 +48,5 @@ export const createTextFormattingPlugin = (): Plugin<StateField<
         return oldPluginState;
       },
     },
-    key: pluginKey,
   });
 };
