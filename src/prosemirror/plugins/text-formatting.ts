@@ -6,7 +6,7 @@ import {
   Transaction,
 } from 'prosemirror-state';
 import { toggleMark } from 'prosemirror-commands';
-import { TextFormattingPluginState } from '../types';
+import { TextFormattingPluginState } from '../../types';
 import { isMarkActive } from '../utils';
 
 export const pluginKey = new PluginKey('textFormatting');

@@ -1,5 +1,5 @@
 import { EditorState, PluginKey, Plugin } from 'prosemirror-state';
-import { EditorPluginStates, PluginState } from '../types';
+import { EditorPluginStates, PluginState } from '../../types';
 import { pluginKey as textFormattingPluginKey } from './text-formatting';
 
 const generateNewPluginStates = (
