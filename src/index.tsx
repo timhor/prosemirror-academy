@@ -1,11 +1,13 @@
 import React, { useState, createContext, useRef, useEffect } from 'react';
 import { EditorView } from 'prosemirror-view';
-import { EditorState } from 'prosemirror-state';
+import { EditorState, Plugin } from 'prosemirror-state';
 import ReactDOM from 'react-dom';
-import MenuBar from './ui/MenuBar';
-import { createPluginList, buildEditorPluginStates } from './plugins';
-import { schema } from './schema';
 import { EditorPluginStates, EditorContextType } from './types';
+import MenuBar from './react/ui/MenuBar';
+import {
+  initProseMirrorEditorView,
+  buildEditorPluginStates,
+} from './prosemirror';
 import './index.css';
 
 const { Consumer: EditorConsumer, Provider: EditorProvider } = createContext<
@@ -14,11 +16,8 @@ const { Consumer: EditorConsumer, Provider: EditorProvider } = createContext<
   editorView: null,
   editorPluginStates: {},
 });
-const plugins = createPluginList({
-  schema,
-});
 
-const EditorComponent = ({
+const EditorReactMountComponent = ({
   editorRef,
 }: {
   editorRef: React.RefObject<HTMLDivElement>;
@@ -32,27 +31,23 @@ const EditorComponent = ({
   useEffect(() => {
     if (editorRef && editorRef.current) {
       const target = editorRef.current;
-      editorView.current = new EditorView(target, {
-        state: EditorState.create({
-          plugins,
-          schema,
-        }),
-        dispatchTransaction(tr) {
-          if (editorView.current) {
-            const newEditorState = editorView.current.state.apply(tr);
+      const updateEditorPluginState = (
+        newEditorState: EditorState,
+        plugins: Array<Plugin>,
+      ) => {
+        setEditorPluginStates(buildEditorPluginStates(newEditorState, plugins));
+      };
 
-            editorView.current.updateState(newEditorState);
-
-            setEditorPluginStates(
-              buildEditorPluginStates(newEditorState, plugins),
-            );
-          }
-        },
+      /*
+       * For now, we have only two lifecycle events: init and update;
+       * We are using those methods to sync the React State with Prosemirror PluginState.
+       *
+       * You will learn more about that, you don't need to know about it to start writting your plugins.
+       * */
+      editorView.current = initProseMirrorEditorView(target, {
+        onUpdateEditorState: updateEditorPluginState,
+        onInitEditorView: updateEditorPluginState,
       });
-
-      setEditorPluginStates(
-        buildEditorPluginStates(editorView.current.state, plugins),
-      );
 
       return () => {
         if (editorView.current) {
@@ -86,12 +81,33 @@ const EditorComponent = ({
     </EditorProvider>
   );
 };
+
+/*
+ * The app starts here, but you won't need to touch on this part of the code
+ * because of the integration between React and ProseMirror will happen on EditorReactMountComponent.
+ */
 const App = () => {
+  /*
+   * The [EditorView](https://prosemirror.net/docs/ref/#view.EditorView.constructor) needs a domNode to mounting
+   * EditorView needs a DOM node to append into it.  Usually, we use a `div` but can be any DOM node.
+   *
+   * The "prosemirror-view" will take care of mounting,
+   * update and manager this node and all its children.
+   *
+   * Please do not add anything inside of it because
+   * React will try to control the re-render,
+   * then you can end up in an infinite loop os renders.
+   *
+   * To make our lives easier,
+   * we are using some default CSS coming from Prosemirror code.
+   * You can check that on `public/index.html` and `index.css`,
+   * to make this work, we need to have the `id="editor"` on the div.
+   */
   const editorRef = useRef<HTMLDivElement>(document.createElement('div'));
 
   return (
     <div>
-      <EditorComponent editorRef={editorRef} />
+      <EditorReactMountComponent editorRef={editorRef} />
       <div id="editor" ref={editorRef} />
     </div>
   );

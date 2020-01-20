@@ -14,6 +14,11 @@ export const nodes: NodeSpec = {
     content: 'block+',
   },
 
+  // :: NodeSpec The text node.
+  text: {
+    group: 'inline',
+  },
+
   // :: NodeSpec A plain paragraph textblock. Represented in the DOM
   // as a `<p>` element.
   paragraph: {
@@ -31,6 +36,7 @@ export const nodes: NodeSpec = {
   heading: {
     attrs: { level: { default: 1 } },
     content: 'inline*',
+    marks: 'em',
     group: 'block',
     defining: true,
     parseDOM: [
@@ -41,11 +47,6 @@ export const nodes: NodeSpec = {
     toDOM(node: ProseMirrorNode) {
       return ['h' + node.attrs.level, 0];
     },
-  },
-
-  // :: NodeSpec The text node.
-  text: {
-    group: 'inline',
   },
 
   // :: NodeSpec A code listing. Disallows marks or non-text inline
