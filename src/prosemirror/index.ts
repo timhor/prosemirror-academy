@@ -37,7 +37,7 @@ export const initProseMirrorEditorView = (
    *  The main thing about how ProseMirror works, there is an excellent guide about what is an (EditorState)[https://prosemirror.net/docs/guide/#state].
    *
    *
-   * EditorView is a singleton.
+   * EditorView is mutable!
    * With this in mind, we will use its instance later,
    * whether to update the EditorState or to dispatch new transactions.
    */
