@@ -76,8 +76,6 @@ export const nodes: NodeSpec = {
   },
 };
 
-const strongDOM = ['strong', 0];
-
 // :: Object [Specs](#model.MarkSpec) for the marks in the schema.
 export const marks: MarkSpec = {
   strong: {
@@ -98,7 +96,7 @@ export const marks: MarkSpec = {
       },
     ],
     toDOM() {
-      return strongDOM;
+      return ['strong', 0];
     },
   },
 
