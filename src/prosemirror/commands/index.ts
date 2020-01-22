@@ -1,4 +1,4 @@
-import { NodeType } from 'prosemirror-model';
+import { NodeType, Node } from 'prosemirror-model';
 import { toggleMark } from 'prosemirror-commands';
 import { Command } from '../../types';
 
@@ -75,5 +75,50 @@ export const createHeading = (level: number): Command => (state, dispatch) => {
 };
 
 export const toggleTextAlignment = (alignmentType: 'center'): Command => (state, dispatch) => {
+  const doc = state.doc;
+  const selection = state.selection;
+  type NodeToReplaceType = {
+     startPosition: number,
+     endPosition: number,
+     node: Node,
+  };
+  const nodesToReplace: Array<NodeToReplaceType> = [];
+
+  doc.nodesBetween(selection.from, selection.to, (node, pos, parent, index) => {
+    if (node.type.name === 'paragraph') {
+      nodesToReplace.push({
+        startPosition: pos,
+        endPosition: pos + node.nodeSize,
+        node
+      })
+      return false;
+    }
+  });
+
+  const applyMarkOnNode = (nodeToReplace: NodeToReplaceType): NodeToReplaceType => {
+    const paragraphNodeType: NodeType = state.schema.nodes.paragraph;
+    const newNode = paragraphNodeType.create(null, nodeToReplace.node.content);
+
+    return {
+      startPosition: nodeToReplace.startPosition,
+      endPosition: nodeToReplace.endPosition,
+      node: newNode,
+    };
+  }
+
+  const newNodes = nodesToReplace.map(applyMarkOnNode);
+  const tr = state.tr;
+  newNodes.forEach((node: NodeToReplaceType) => {
+    tr.replaceWith(
+      node.startPosition,
+      node.endPosition,
+      node.node,
+    );
+  })
+
+  if (dispatch) {
+    dispatch(tr);
+  }
+
   return true;
 }
