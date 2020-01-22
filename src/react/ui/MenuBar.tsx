@@ -5,6 +5,7 @@ import {
   toggleStrongMark,
   createCodeBlock,
   createHeading,
+  toggleTextAlignment
 } from '../../prosemirror/commands';
 
 type MenuBarProps = EditorContextType & {
@@ -69,6 +70,22 @@ const HeadingMenuItem = ({
   );
 };
 
+const TextAlignmentCentreMenuItem = ({
+  editorView: { state, dispatch },
+  pluginState,
+}: MenuItem<TextFormattingPluginState>) => {
+  const onClick = useCallback(() => {
+    toggleTextAlignment('center')(state, dispatch);
+  }, [state, dispatch]);
+  return (
+    <button
+      onClick={onClick}
+    >
+      CENTRE ALIGN
+    </button>
+  );
+};
+
 const MenuBar = ({ editorView, editorPluginStates }: MenuBarProps) => {
   const { textFormattingPluginState } = editorPluginStates;
 
@@ -97,6 +114,10 @@ const MenuBar = ({ editorView, editorPluginStates }: MenuBarProps) => {
         editorView={editorView}
         pluginState={textFormattingPluginState}
         level={3}
+      />
+      <TextAlignmentCentreMenuItem
+        editorView={editorView}
+        pluginState={textFormattingPluginState}
       />
     </div>
   );

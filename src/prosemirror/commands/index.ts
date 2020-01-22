@@ -73,3 +73,7 @@ export const createHeading = (level: number): Command => (state, dispatch) => {
 
   return setBlockTypeInSelection(heading, { level })(state, dispatch);
 };
+
+export const toggleTextAlignment = (alignmentType: 'center'): Command => (state, dispatch) => {
+  return true;
+}
