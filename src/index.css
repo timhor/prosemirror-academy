@@ -59,3 +59,7 @@ code {
   padding: 0.5em 1em;
   border: 1px solid #bebab0;
 }
+
+.text-align__centre {
+  text-align: center;
+}

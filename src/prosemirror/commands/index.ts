@@ -1,4 +1,4 @@
-import { NodeType, Node } from 'prosemirror-model';
+import { NodeType, Node, MarkType } from 'prosemirror-model';
 import { toggleMark } from 'prosemirror-commands';
 import { Command } from '../../types';
 
@@ -97,7 +97,10 @@ export const toggleTextAlignment = (alignmentType: 'center'): Command => (state,
 
   const applyMarkOnNode = (nodeToReplace: NodeToReplaceType): NodeToReplaceType => {
     const paragraphNodeType: NodeType = state.schema.nodes.paragraph;
-    const newNode = paragraphNodeType.create(null, nodeToReplace.node.content);
+    const textAlignmentMarkType: MarkType = state.schema.marks.text_align;
+    const newNode = paragraphNodeType.createChecked(null, nodeToReplace.node.content, [
+      textAlignmentMarkType.create(),
+    ]);
 
     return {
       startPosition: nodeToReplace.startPosition,
