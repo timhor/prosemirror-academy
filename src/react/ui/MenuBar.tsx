@@ -70,18 +70,50 @@ const HeadingMenuItem = ({
   );
 };
 
+const TextAlignmentLeftMenuItem = ({
+  editorView: { state, dispatch },
+  pluginState,
+}: MenuItem<TextFormattingPluginState>) => {
+  const onClick = useCallback(() => {
+    toggleTextAlignment('left')(state, dispatch);
+  }, [state, dispatch]);
+  return (
+    <button
+      onClick={onClick}
+    >
+      LEFT ALIGN
+    </button>
+  );
+};
+
 const TextAlignmentCentreMenuItem = ({
   editorView: { state, dispatch },
   pluginState,
 }: MenuItem<TextFormattingPluginState>) => {
   const onClick = useCallback(() => {
-    toggleTextAlignment('center')(state, dispatch);
+    toggleTextAlignment('centre')(state, dispatch);
   }, [state, dispatch]);
   return (
     <button
       onClick={onClick}
     >
       CENTRE ALIGN
+    </button>
+  );
+};
+
+const TextAlignmentRightMenuItem = ({
+  editorView: { state, dispatch },
+  pluginState,
+}: MenuItem<TextFormattingPluginState>) => {
+  const onClick = useCallback(() => {
+    toggleTextAlignment('right')(state, dispatch);
+  }, [state, dispatch]);
+  return (
+    <button
+      onClick={onClick}
+    >
+      RIGHT ALIGN
     </button>
   );
 };
@@ -115,7 +147,15 @@ const MenuBar = ({ editorView, editorPluginStates }: MenuBarProps) => {
         pluginState={textFormattingPluginState}
         level={3}
       />
+      <TextAlignmentLeftMenuItem
+        editorView={editorView}
+        pluginState={textFormattingPluginState}
+      />
       <TextAlignmentCentreMenuItem
+        editorView={editorView}
+        pluginState={textFormattingPluginState}
+      />
+      <TextAlignmentRightMenuItem
         editorView={editorView}
         pluginState={textFormattingPluginState}
       />

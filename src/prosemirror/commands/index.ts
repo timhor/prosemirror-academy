@@ -74,7 +74,7 @@ export const createHeading = (level: number): Command => (state, dispatch) => {
   return setBlockTypeInSelection(heading, { level })(state, dispatch);
 };
 
-export const toggleTextAlignment = (alignmentType: 'center'): Command => (state, dispatch) => {
+export const toggleTextAlignment = (alignment: 'left' | 'centre' | 'right'): Command => (state, dispatch) => {
   const doc = state.doc;
   const selection = state.selection;
   type NodeToReplaceType = {
@@ -99,7 +99,7 @@ export const toggleTextAlignment = (alignmentType: 'center'): Command => (state,
     const paragraphNodeType: NodeType = state.schema.nodes.paragraph;
     const textAlignmentMarkType: MarkType = state.schema.marks.text_align;
     const newNode = paragraphNodeType.createChecked(null, nodeToReplace.node.content, [
-      textAlignmentMarkType.create(),
+      textAlignmentMarkType.create({ alignment }),
     ]);
 
     return {
