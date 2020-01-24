@@ -63,3 +63,7 @@ code {
 .text-align__centre {
   text-align: center;
 }
+
+.text-align__right {
+  text-align: right;
+}

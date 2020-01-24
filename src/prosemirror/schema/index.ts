@@ -109,9 +109,18 @@ export const marks: MarkSpec = {
   },
 
   text_align: {
+    attrs: {
+      alignment: {
+        default: 'left'
+      }
+    },
     parseDOM: [{ tag: 'div.text-align' }],
-    toDOM() {
-      return ['div', {class: 'text-align text-align__centre'}, 0];
+    toDOM(mark) {
+      const alignment = mark.attrs.alignment;
+      if (alignment === 'centre' || alignment === 'right') {
+        return ['div', { class: `text-align text-align__${alignment}` }, 0];
+      }
+      return ['div', 0];
     }
   }
 };
