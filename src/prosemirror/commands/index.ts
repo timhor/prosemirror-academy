@@ -74,50 +74,43 @@ export const createHeading = (level: number): Command => (state, dispatch) => {
   return setBlockTypeInSelection(heading, { level })(state, dispatch);
 };
 
+// https://stackoverflow.com/a/58110124
+function nonNullable<T>(value: T): value is NonNullable<T> {
+  return value !== null && value !== undefined;
+}
+
 export const toggleTextAlignment = (alignment: 'left' | 'centre' | 'right'): Command => (state, dispatch) => {
   const doc = state.doc;
   const selection = state.selection;
-  type NodeToReplaceType = {
-     startPosition: number,
-     endPosition: number,
-     node: Node,
-  };
-  const nodesToReplace: Array<NodeToReplaceType> = [];
+  const tr = state.tr; // only do this once at the beginning as accessing state.tr creates a new transaction
 
-  doc.nodesBetween(selection.from, selection.to, (node, pos, parent, index) => {
+  const textAlignmentMarkType: MarkType = state.schema.marks.text_align;
+  doc.nodesBetween(selection.from, selection.to, (node, pos) => {
     if (node.type.name === 'paragraph') {
-      nodesToReplace.push({
-        startPosition: pos,
-        endPosition: pos + node.nodeSize,
-        node
-      })
+
+      const marks = node.marks
+        .map(mark => {
+          if (mark.type !== textAlignmentMarkType) {
+            return mark;
+          }
+          return null;
+        })
+        .filter(nonNullable);
+
+      if (alignment !== 'left') {
+        marks.push(textAlignmentMarkType.create({ alignment }));
+      }
+
+      tr.setNodeMarkup(
+        pos,
+        undefined,
+        undefined,
+        marks,
+      );
+
       return false;
     }
   });
-
-  const applyMarkOnNode = (nodeToReplace: NodeToReplaceType): NodeToReplaceType => {
-    const paragraphNodeType: NodeType = state.schema.nodes.paragraph;
-    const textAlignmentMarkType: MarkType = state.schema.marks.text_align;
-    const newNode = paragraphNodeType.createChecked(null, nodeToReplace.node.content, [
-      textAlignmentMarkType.create({ alignment }),
-    ]);
-
-    return {
-      startPosition: nodeToReplace.startPosition,
-      endPosition: nodeToReplace.endPosition,
-      node: newNode,
-    };
-  }
-
-  const newNodes = nodesToReplace.map(applyMarkOnNode);
-  const tr = state.tr;
-  newNodes.forEach((node: NodeToReplaceType) => {
-    tr.replaceWith(
-      node.startPosition,
-      node.endPosition,
-      node.node,
-    );
-  })
 
   if (dispatch) {
     dispatch(tr);

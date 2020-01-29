@@ -120,16 +120,13 @@ export const marks: { [key: string]: MarkSpec } = {
   text_align: {
     attrs: {
       alignment: {
-        default: 'left'
+        default: null
       }
     },
     parseDOM: [{ tag: 'div.text-align' }],
     toDOM(mark) {
       const alignment = mark.attrs.alignment;
-      if (alignment === 'centre' || alignment === 'right') {
-        return ['div', { class: `text-align text-align__${alignment}` }, 0];
-      }
-      return ['div', 0];
+      return ['div', { class: `text-align text-align__${alignment}` }, 0];
     }
   }
 };
