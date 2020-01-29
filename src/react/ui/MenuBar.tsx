@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { EditorView } from 'prosemirror-view';
 import { EditorContextType, TextFormattingPluginState } from '../../types';
 import {
@@ -118,6 +118,33 @@ const TextAlignmentRightMenuItem = ({
   );
 };
 
+const SearchReplaceMenuItem = ({
+  editorView: { state, dispatch },
+}: MenuItem<TextFormattingPluginState>) => {
+  const searchRef = useRef<HTMLInputElement>(document.createElement('input'));
+  const replaceRef = useRef<HTMLInputElement>(document.createElement('input'));
+
+  const onClick = useCallback(() => {
+    const searchInput = searchRef.current;
+    const replaceInput = replaceRef.current;
+
+    if (!searchInput || !replaceInput) {
+      // ensure both input fields exist
+      return;
+    }
+
+    // TODO: perform search and replace
+  }, [state, dispatch]);
+
+  return (
+    <div>
+      <input type="text" placeholder="Search" ref={searchRef} />
+      <input type="text" placeholder="Replace" ref={replaceRef} />
+      <button onClick={onClick}>Perform Replacement</button>
+    </div>
+  );
+};
+
 const MenuBar = ({ editorView, editorPluginStates }: MenuBarProps) => {
   const { textFormattingPluginState } = editorPluginStates;
 
@@ -158,6 +185,9 @@ const MenuBar = ({ editorView, editorPluginStates }: MenuBarProps) => {
       <TextAlignmentRightMenuItem
         editorView={editorView}
         pluginState={textFormattingPluginState}
+      />
+      <SearchReplaceMenuItem
+        editorView={editorView}
       />
     </div>
   );
