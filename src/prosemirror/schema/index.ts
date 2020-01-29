@@ -8,7 +8,7 @@ import {
 
 // :: Object
 // [Specs](#model.NodeSpec) for the nodes defined in this schema.
-export const nodes: NodeSpec = {
+export const nodes: { [key: string]: NodeSpec } = {
   // :: NodeSpec The top level document node.
   doc: {
     content: 'block+',
@@ -76,8 +76,6 @@ export const nodes: NodeSpec = {
   },
 };
 
-const strongDOM = ['strong', 0];
-
 // :: Object [Specs](#model.MarkSpec) for the marks in the schema.
 export const marks: { [key: string]: MarkSpec } = {
   strong: {
@@ -88,26 +86,25 @@ export const marks: { [key: string]: MarkSpec } = {
       // tags with a font-weight normal.
       {
         tag: 'b',
-        getAttrs: (node) => {
+        getAttrs: node => {
           if (typeof node === 'string') {
             return null;
           }
           return (node as HTMLElement).style.fontWeight !== 'normal' && null;
         },
-
       },
       {
         style: 'font-weight',
-        getAttrs: (value) => {
+        getAttrs: value => {
           if (typeof value === 'string') {
             return /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null;
           }
           return null;
-        }
+        },
       },
     ],
     toDOM() {
-      return strongDOM;
+      return ['strong', 0];
     },
   },
 
