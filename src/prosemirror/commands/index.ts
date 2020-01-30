@@ -118,3 +118,39 @@ export const toggleTextAlignment = (alignment: 'left' | 'centre' | 'right'): Com
 
   return true;
 }
+
+export const performSearchReplace = (searchReplaceStrings: {
+  searchString: string;
+  replaceString: string;
+}): Command => (state, dispatch) => {
+  const { tr, doc } = state;
+  const { searchString, replaceString } = searchReplaceStrings;
+  const textNodeType = state.schema.nodes.text;
+
+  // -2 because nodeSize captures the opening and closing tags as well
+  doc.nodesBetween(0, doc.nodeSize - 2, (node, pos) => {
+    // apply the change to text nodes only (can also check using Node.isText)
+    if (node.type === textNodeType) {
+      const nodeText = node.text
+      if (!nodeText) {
+        return;
+      }
+      if (nodeText.includes(searchString)) {
+        const newString = nodeText.replace(searchString, replaceString);
+        // create a new node with replaceString (also create a new marks array to ensure immutability)
+        const newNode = state.schema.text(newString, [...node.marks]);
+        // adjust positions (e.g. if replaceString is shorter/longer than searchString)
+        const fromResolved = tr.mapping.map(pos);
+        const toResolved = tr.mapping.map(pos + node.nodeSize);
+        // replace the old node with the new one
+        tr.replaceWith(fromResolved, toResolved, newNode);
+      }
+    }
+  });
+
+  if (dispatch) {
+    dispatch(tr);
+  }
+
+  return true;
+};

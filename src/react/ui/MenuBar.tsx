@@ -5,7 +5,8 @@ import {
   toggleStrongMark,
   createCodeBlock,
   createHeading,
-  toggleTextAlignment
+  toggleTextAlignment,
+  performSearchReplace
 } from '../../prosemirror/commands';
 
 type MenuBarProps = EditorContextType & {
@@ -133,7 +134,10 @@ const SearchReplaceMenuItem = ({
       return;
     }
 
-    // TODO: perform search and replace
+    performSearchReplace({
+      searchString: searchInput.value,
+      replaceString: replaceInput.value,
+    })(state, dispatch);
   }, [state, dispatch]);
 
   return (
