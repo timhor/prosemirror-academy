@@ -6,7 +6,8 @@ import {
   createCodeBlock,
   createHeading,
   toggleTextAlignment,
-  performSearchReplace
+  performSearchReplace,
+  performFind
 } from '../../prosemirror/commands';
 
 type MenuBarProps = EditorContextType & {
@@ -125,6 +126,19 @@ const SearchReplaceMenuItem = ({
   const searchRef = useRef<HTMLInputElement>(document.createElement('input'));
   const replaceRef = useRef<HTMLInputElement>(document.createElement('input'));
 
+  const onFind = useCallback(() => {
+    const searchInput = searchRef.current;
+
+    if (!searchInput) {
+      // ensure input field exists
+      return;
+    }
+
+    performFind({
+      searchString: searchInput.value
+    })(state, dispatch);
+  }, [state, dispatch]);
+
   const onClick = useCallback(() => {
     const searchInput = searchRef.current;
     const replaceInput = replaceRef.current;
@@ -143,6 +157,7 @@ const SearchReplaceMenuItem = ({
   return (
     <div>
       <input type="text" placeholder="Search" ref={searchRef} />
+      <button onClick={onFind}>Find</button>
       <input type="text" placeholder="Replace" ref={replaceRef} />
       <button onClick={onClick}>Perform Replacement</button>
     </div>

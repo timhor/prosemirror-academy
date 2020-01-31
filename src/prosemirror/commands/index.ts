@@ -119,6 +119,12 @@ export const toggleTextAlignment = (alignment: 'left' | 'centre' | 'right'): Com
   return true;
 }
 
+export const performFind = (searchOptions: {
+  searchString: string;
+}): Command => (state, dispatch) => {
+  return true;
+}
+
 export const performSearchReplace = (searchReplaceOptions: {
   searchString: string;
   replaceString: string;
