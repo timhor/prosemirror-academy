@@ -119,13 +119,13 @@ export const toggleTextAlignment = (alignment: 'left' | 'centre' | 'right'): Com
   return true;
 }
 
-export const performSearchReplace = (searchReplaceStrings: {
+export const performSearchReplace = (searchReplaceOptions: {
   searchString: string;
   replaceString: string;
 }): Command => (state, dispatch) => {
   const { tr, doc } = state;
-  const { searchString, replaceString } = searchReplaceStrings;
-  const textNodeType = state.schema.nodes.text;
+  const { searchString, replaceString } = searchReplaceOptions;
+  const textNodeType = state.schema.nodes.text; // this is a node TYPE, not the node itself
 
   // -2 because nodeSize captures the opening and closing tags as well
   doc.nodesBetween(0, doc.nodeSize - 2, (node, pos) => {
