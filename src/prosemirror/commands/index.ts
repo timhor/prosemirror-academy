@@ -111,12 +111,17 @@ export const toggleTextAlignment = (alignment: 'left' | 'centre' | 'right'): Com
     }
   });
 
+  // if there is no change in the transaction, it is the same as checking for a code block
+  // because the document could not have been modified unless the selection is in a paragraph
+  // or heading (that validation is already done in the nodesBetween callback above)
+  // [note: it is an anti-pattern to return false after dispatch]
+  if (!tr.docChanged) {
+    return false;
+  }
+
   if (dispatch) {
     dispatch(tr);
   }
 
-  if (tr.selection.$anchor.parent.type === state.schema.nodes.code_block) {
-    return false;
-  }
   return true;
 }
