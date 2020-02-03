@@ -87,7 +87,6 @@ export const toggleTextAlignment = (alignment: 'left' | 'centre' | 'right'): Com
   const textAlignmentMarkType: MarkType = state.schema.marks.text_align;
   doc.nodesBetween(selection.from, selection.to, (node, pos) => {
     if (node.type.name === 'paragraph') {
-
       const marks = node.marks
         .map(mark => {
           if (mark.type !== textAlignmentMarkType) {
@@ -116,5 +115,8 @@ export const toggleTextAlignment = (alignment: 'left' | 'centre' | 'right'): Com
     dispatch(tr);
   }
 
+  if (tr.selection.$anchor.parent.type === state.schema.nodes.code_block) {
+    return false;
+  }
   return true;
 }

@@ -6,6 +6,7 @@ export type TextFormattingPluginState = {
   strongDisabled: boolean;
   strongActive: boolean;
   headingActive: number | null;
+  alignmentDisabled: boolean;
 };
 export type PluginState = TextFormattingPluginState;
 

@@ -1,3 +1,4 @@
+import { toggleTextAlignment } from './../commands/index';
 import {
   Plugin,
   EditorState,
@@ -22,6 +23,7 @@ export const createTextFormattingPlugin = (): Plugin<StateField<
           strongDisabled: false,
           strongActive: false,
           headingActive: null,
+          alignmentDisabled: false
         };
       },
 
@@ -42,6 +44,7 @@ export const createTextFormattingPlugin = (): Plugin<StateField<
             ...oldPluginState,
             strongDisabled: !toggleMark(strong)(newState),
             strongActive: Boolean(isMarkActive(newState, strong)),
+            alignmentDisabled: !toggleTextAlignment('left')(newState)
           };
         }
 

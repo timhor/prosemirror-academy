@@ -77,8 +77,12 @@ const TextAlignmentLeftMenuItem = ({
   const onClick = useCallback(() => {
     toggleTextAlignment('left')(state, dispatch);
   }, [state, dispatch]);
+
+  const { alignmentDisabled = false } = pluginState || {};
+
   return (
     <button
+      disabled={alignmentDisabled}
       onClick={onClick}
     >
       LEFT ALIGN
@@ -93,8 +97,12 @@ const TextAlignmentCentreMenuItem = ({
   const onClick = useCallback(() => {
     toggleTextAlignment('centre')(state, dispatch);
   }, [state, dispatch]);
+
+  const { alignmentDisabled = false } = pluginState || {};
+
   return (
     <button
+      disabled={alignmentDisabled}
       onClick={onClick}
     >
       CENTRE ALIGN
@@ -109,8 +117,12 @@ const TextAlignmentRightMenuItem = ({
   const onClick = useCallback(() => {
     toggleTextAlignment('right')(state, dispatch);
   }, [state, dispatch]);
+
+  const { alignmentDisabled = false } = pluginState || {};
+
   return (
     <button
+      disabled={alignmentDisabled}
       onClick={onClick}
     >
       RIGHT ALIGN
