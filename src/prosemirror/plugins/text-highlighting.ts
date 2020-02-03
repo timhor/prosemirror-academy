@@ -8,29 +8,33 @@ export type TextHighlightingPluginState = {
   stringToHighlight: string | null;
 };
 
-const createNodeDecoration = (pos: number, node: Node): Decoration => {
-  const startPos = pos;
-  const endPos = pos + node.nodeSize;
-  return Decoration.node(startPos, endPos, {
-    class: 'text-highlight',
-  });
-}
-
-const createInlineDecoration = (pos: number, node: Node): Decoration | null => {
+const createInlineDecorations = (
+  pos: number,
+  node: Node,
+  stringToHighlight: string,
+): Decoration[] | null => {
   if (!node.text) {
     return null;
   }
-
-  // need to offset by `pos` because the values of `from` and `to` in Decoration.inline are relative to
-  // the position of `node` on the document (without it, indexOf would always return the same number
-  // even for nodes not on the first line)
-  // TODO: remove hardcoding
-  const startPos = pos + node.text?.indexOf('text');
-  const endPos = pos + node.text?.indexOf('text') + 'text'.length;
-  return Decoration.inline(startPos, endPos, {
-    nodeName: 'strong',
-    class: 'text-highlight',
-  });
+  const decorations: Decoration[] = [];
+  const matches = node.text.matchAll(RegExp(stringToHighlight, 'g'));
+  for (const match of matches) {
+    const { index } =  match;
+    if (typeof index === 'number') {
+      // need to offset by `pos` because the values of `from` and `to` in Decoration.inline are relative to
+      // the position of `node` on the document (without it, indexOf would always return the same number
+      // even for nodes not on the first line)
+      const startPos = pos + index;
+      const endPos = startPos + stringToHighlight.length;
+      decorations.push(
+        Decoration.inline(startPos, endPos, {
+          nodeName: 'strong',
+          class: 'text-highlight',
+        }),
+      );
+    }
+  }
+  return decorations;
 };
 
 export const createTextHighlightingPlugin = (): Plugin<StateField<
@@ -67,15 +71,12 @@ export const createTextHighlightingPlugin = (): Plugin<StateField<
                 return;
               }
 
-              // this distinction is needed as ProseMirror 'merges' nodes of the same type
-              // - node decoration would work for <p>word <strong>match</strong> word</p> (node.text === 'match')
-              // - inline decoration required for <p>word word match word</p> (node.text === 'word word match word')
-              if (node.text === stringToHighlight) {
-                decorations.push(createNodeDecoration(pos, node));
-              } else if (node.text.includes(stringToHighlight)) {
-                const inlineDecoration = createInlineDecoration(pos, node);
-                if (inlineDecoration) {
-                  decorations.push(inlineDecoration);
+              // check for substring instead of exact match because for something like <p>word word match word</p>,
+              // node.text would be 'word word match word'
+              if (node.text.includes(stringToHighlight)) {
+                const inlineDecorations = createInlineDecorations(pos, node, stringToHighlight);
+                if (inlineDecorations) {
+                  decorations.push(...inlineDecorations);
                 }
               }
             },
