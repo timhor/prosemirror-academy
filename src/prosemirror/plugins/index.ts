@@ -5,6 +5,7 @@ import { EditorPluginListOptions, KeymapPluginType } from '../../types';
 import { Schema } from 'prosemirror-model';
 import { buildInputRules } from './input-rules';
 import { createTextFormattingPlugin } from './text-formatting';
+import { createTextHighlightingPlugin } from './text-highlighting';
 import { Plugin } from 'prosemirror-state';
 
 const buildKeymap = (schema: Schema): KeymapPluginType => {
@@ -43,6 +44,8 @@ export const createPluginList = (
      * If you want to understand what a plugin is, (check this file)[src/prosemirror/plugins/README.md]
      */
     createTextFormattingPlugin(),
+
+    createTextHighlightingPlugin()
   ];
 
   return plugins;

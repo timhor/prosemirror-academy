@@ -1,6 +1,7 @@
 import { NodeType, Node, MarkType } from 'prosemirror-model';
 import { toggleMark } from 'prosemirror-commands';
 import { Command } from '../../types';
+import { pluginKey as textHighlightingPluginKey } from '../plugins/text-highlighting';
 
 // :: (NodeType, ?Object) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
 // Returns a command that tries to set the selected textblocks to the
@@ -122,6 +123,14 @@ export const toggleTextAlignment = (alignment: 'left' | 'centre' | 'right'): Com
 export const performFind = (searchOptions: {
   searchString: string;
 }): Command => (state, dispatch) => {
+  const { tr } = state;
+
+  // set metadata in transaction so that the plugin can access the searchString
+  tr.setMeta(textHighlightingPluginKey, searchOptions.searchString);
+
+  if (dispatch) {
+    dispatch(tr);
+  }
   return true;
 }
 
