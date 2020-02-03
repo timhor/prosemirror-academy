@@ -89,7 +89,10 @@ export const createTextHighlightingPlugin = (): Plugin<StateField<
           };
         }
 
-        return oldPluginState;
+        return {
+          ...oldPluginState,
+          decorationSet: null
+        };
       },
     },
     props: {
