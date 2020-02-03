@@ -142,8 +142,17 @@ export const performSearchReplace = (searchReplaceOptions: {
   const { searchString, replaceString } = searchReplaceOptions;
   const textNodeType = state.schema.nodes.text; // this is a node TYPE, not the node itself
 
-  // -2 because nodeSize captures the opening and closing tags as well
-  doc.nodesBetween(0, doc.nodeSize - 2, (node, pos) => {
+  let from: number;
+  let to: number;
+  if (tr.selection.from !== tr.selection.to) {
+    // replace throughout document if nothing is selected
+    [from, to] = [tr.selection.from, tr.selection.to];
+  } else {
+    // -2 because nodeSize captures the opening and closing tags as well
+    [from, to] = [0, doc.nodeSize - 2];
+  }
+
+  doc.nodesBetween(from, to, (node, pos) => {
     // apply the change to text nodes only (can also check using Node.isText)
     if (node.type === textNodeType) {
       const nodeText = node.text
