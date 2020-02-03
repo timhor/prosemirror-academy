@@ -56,11 +56,10 @@ export const createTextHighlightingPlugin = (): Plugin<StateField<
         const stringToHighlight = fromMetaStringToHighlight || oldPluginState.stringToHighlight;
 
         // performance optimisations:
-        // - this only happens when the 'Find' button is clicked, the search string is non-empty and it's
-        //   different from the previous search string
+        // - this only happens when the 'Find' button is clicked and the search string is non-empty
         // - tr.docChanged is also needed to trigger the highlighting again after the user modifies the
         //   document, e.g. by typing the word being searched for again
-        if ((stringToHighlight && stringToHighlight !== oldPluginState.stringToHighlight) || tr.docChanged) {
+        if (stringToHighlight || tr.docChanged) {
           const decorations: Decoration[] = [];
           const textNodeType = newEditorState.schema.nodes.text; // this is a node TYPE, not the node itself
           newEditorState.doc.nodesBetween(
