@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { EditorView } from 'prosemirror-view';
-import { EditorContextType, TextFormattingPluginState } from '../../types';
+import { EditorContextType, TextFormattingPluginState, TextAlignmentPluginState } from '../../types';
 import {
   toggleStrongMark,
   createCodeBlock,
@@ -73,7 +73,7 @@ const HeadingMenuItem = ({
 const TextAlignmentLeftMenuItem = ({
   editorView: { state, dispatch },
   pluginState,
-}: MenuItem<TextFormattingPluginState>) => {
+}: MenuItem<TextAlignmentPluginState>) => {
   const onClick = useCallback(() => {
     toggleTextAlignment('left')(state, dispatch);
   }, [state, dispatch]);
@@ -93,7 +93,7 @@ const TextAlignmentLeftMenuItem = ({
 const TextAlignmentCentreMenuItem = ({
   editorView: { state, dispatch },
   pluginState,
-}: MenuItem<TextFormattingPluginState>) => {
+}: MenuItem<TextAlignmentPluginState>) => {
   const onClick = useCallback(() => {
     toggleTextAlignment('centre')(state, dispatch);
   }, [state, dispatch]);
@@ -113,7 +113,7 @@ const TextAlignmentCentreMenuItem = ({
 const TextAlignmentRightMenuItem = ({
   editorView: { state, dispatch },
   pluginState,
-}: MenuItem<TextFormattingPluginState>) => {
+}: MenuItem<TextAlignmentPluginState>) => {
   const onClick = useCallback(() => {
     toggleTextAlignment('right')(state, dispatch);
   }, [state, dispatch]);
@@ -131,7 +131,7 @@ const TextAlignmentRightMenuItem = ({
 };
 
 const MenuBar = ({ editorView, editorPluginStates }: MenuBarProps) => {
-  const { textFormattingPluginState } = editorPluginStates;
+  const { textFormattingPluginState, textAlignmentPluginState } = editorPluginStates;
 
   return (
     <div id="menu-bar">
@@ -161,15 +161,15 @@ const MenuBar = ({ editorView, editorPluginStates }: MenuBarProps) => {
       />
       <TextAlignmentLeftMenuItem
         editorView={editorView}
-        pluginState={textFormattingPluginState}
+        pluginState={textAlignmentPluginState}
       />
       <TextAlignmentCentreMenuItem
         editorView={editorView}
-        pluginState={textFormattingPluginState}
+        pluginState={textAlignmentPluginState}
       />
       <TextAlignmentRightMenuItem
         editorView={editorView}
-        pluginState={textFormattingPluginState}
+        pluginState={textAlignmentPluginState}
       />
     </div>
   );
