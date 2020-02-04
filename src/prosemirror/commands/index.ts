@@ -155,12 +155,15 @@ export const performSearchReplace = (searchReplaceOptions: {
   doc.nodesBetween(from, to, (node, pos) => {
     // apply the change to text nodes only (can also check using Node.isText)
     if (node.type === textNodeType) {
-      const nodeText = node.text
+      const nodeText = node.text;
       if (!nodeText) {
         return;
       }
       if (nodeText.includes(searchString)) {
-        const newString = nodeText.replace(searchString, replaceString);
+        const newString = nodeText.replace(
+          RegExp(searchString, 'g'),
+          replaceString,
+        );
         // create a new node with replaceString (also create a new marks array to ensure immutability)
         const newNode = state.schema.text(newString, [...node.marks]);
         // adjust positions (e.g. if replaceString is shorter/longer than searchString)
