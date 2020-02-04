@@ -1,10 +1,11 @@
 import React, { useCallback } from 'react';
 import { EditorView } from 'prosemirror-view';
-import { EditorContextType, TextFormattingPluginState } from '../../types';
+import { EditorContextType, TextFormattingPluginState, TextAlignmentPluginState } from '../../types';
 import {
   toggleStrongMark,
   createCodeBlock,
   createHeading,
+  toggleTextAlignment
 } from '../../prosemirror/commands';
 
 type MenuBarProps = EditorContextType & {
@@ -69,8 +70,68 @@ const HeadingMenuItem = ({
   );
 };
 
+const TextAlignmentLeftMenuItem = ({
+  editorView: { state, dispatch },
+  pluginState,
+}: MenuItem<TextAlignmentPluginState>) => {
+  const onClick = useCallback(() => {
+    toggleTextAlignment('left')(state, dispatch);
+  }, [state, dispatch]);
+
+  const { alignmentDisabled = false } = pluginState || {};
+
+  return (
+    <button
+      disabled={alignmentDisabled}
+      onClick={onClick}
+    >
+      LEFT ALIGN
+    </button>
+  );
+};
+
+const TextAlignmentCentreMenuItem = ({
+  editorView: { state, dispatch },
+  pluginState,
+}: MenuItem<TextAlignmentPluginState>) => {
+  const onClick = useCallback(() => {
+    toggleTextAlignment('centre')(state, dispatch);
+  }, [state, dispatch]);
+
+  const { alignmentDisabled = false } = pluginState || {};
+
+  return (
+    <button
+      disabled={alignmentDisabled}
+      onClick={onClick}
+    >
+      CENTRE ALIGN
+    </button>
+  );
+};
+
+const TextAlignmentRightMenuItem = ({
+  editorView: { state, dispatch },
+  pluginState,
+}: MenuItem<TextAlignmentPluginState>) => {
+  const onClick = useCallback(() => {
+    toggleTextAlignment('right')(state, dispatch);
+  }, [state, dispatch]);
+
+  const { alignmentDisabled = false } = pluginState || {};
+
+  return (
+    <button
+      disabled={alignmentDisabled}
+      onClick={onClick}
+    >
+      RIGHT ALIGN
+    </button>
+  );
+};
+
 const MenuBar = ({ editorView, editorPluginStates }: MenuBarProps) => {
-  const { textFormattingPluginState } = editorPluginStates;
+  const { textFormattingPluginState, textAlignmentPluginState } = editorPluginStates;
 
   return (
     <div id="menu-bar">
@@ -97,6 +158,18 @@ const MenuBar = ({ editorView, editorPluginStates }: MenuBarProps) => {
         editorView={editorView}
         pluginState={textFormattingPluginState}
         level={3}
+      />
+      <TextAlignmentLeftMenuItem
+        editorView={editorView}
+        pluginState={textAlignmentPluginState}
+      />
+      <TextAlignmentCentreMenuItem
+        editorView={editorView}
+        pluginState={textAlignmentPluginState}
+      />
+      <TextAlignmentRightMenuItem
+        editorView={editorView}
+        pluginState={textAlignmentPluginState}
       />
     </div>
   );

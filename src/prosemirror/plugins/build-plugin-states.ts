@@ -1,12 +1,14 @@
 import { EditorState, PluginKey, Plugin } from 'prosemirror-state';
 import { EditorPluginStates, PluginState } from '../../types';
 import { pluginKey as textFormattingPluginKey } from './text-formatting';
+import { pluginKey as textAlignmentPluginKey } from './text-alignment';
 
 const generateNewPluginStates = (
   pluginSpecs: WeakMap<PluginKey, PluginState>,
 ): EditorPluginStates => {
   return {
     textFormattingPluginState: pluginSpecs.get(textFormattingPluginKey),
+    textAlignmentPluginState: pluginSpecs.get(textAlignmentPluginKey),
   };
 };
 

@@ -4,7 +4,7 @@ We don't too much interaction from `prosemirror` code. The exception are the com
 
 For example, if our MenuItem needs to toggle a mark in the current selection, this is how we are doing this:
 
-```
+```js
 import { toggleStrongMark } from '../../prosemirror/commands';
 
 
