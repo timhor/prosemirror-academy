@@ -152,13 +152,15 @@ export const saveReplaceString = (searchOptions: {
   return true;
 };
 
-const replaceNode = (
+const replaceNode = (replaceOptions: {
   tr: Transaction,
   node: Node,
   searchString: string,
   replaceString: string,
   pos: number,
-) => {
+}) => {
+  const { tr, node, searchString, replaceString, pos } = replaceOptions;
+
   // apply the change to text nodes only
   if (!node.isText || !node.text || !node.text.includes(searchString)) {
     return;
@@ -194,7 +196,7 @@ export const performSearchReplace = (searchReplaceOptions: {
   }
 
   doc.nodesBetween(from, to, (node, pos) => {
-    replaceNode(tr, node, searchString, replaceString, pos);
+    replaceNode({ tr, node, searchString, replaceString, pos });
   });
 
   if (dispatch) {
