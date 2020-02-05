@@ -1,4 +1,5 @@
-import { NodeType, MarkType } from 'prosemirror-model';
+import { Node, NodeType, MarkType } from 'prosemirror-model';
+import { Transaction } from 'prosemirror-state';
 import { toggleMark } from 'prosemirror-commands';
 import { Command } from '../../types';
 import { pluginKey as textHighlightingPluginKey } from '../plugins/text-highlighting';
@@ -151,13 +152,36 @@ export const saveReplaceString = (searchOptions: {
   return true;
 };
 
+const replaceNode = (
+  tr: Transaction,
+  node: Node,
+  searchString: string,
+  replaceString: string,
+  pos: number,
+) => {
+  // apply the change to text nodes only
+  if (!node.isText || !node.text || !node.text.includes(searchString)) {
+    return;
+  }
+
+  // adjust positions (e.g. if replaceString is shorter/longer than searchString)
+  const fromResolved = tr.mapping.map(pos);
+  const toResolved = tr.mapping.map(pos + node.nodeSize);
+  const newString = node.text.replace(RegExp(searchString, 'g'), replaceString);
+
+  // create a new node with replaceString (also create a new marks array to ensure immutability)
+  const newNode = node.type.schema.text(newString, [...node.marks]);
+
+  // replace the old node with the new one
+  tr.replaceWith(fromResolved, toResolved, newNode);
+};
+
 export const performSearchReplace = (searchReplaceOptions: {
   searchString: string;
   replaceString: string;
 }): Command => (state, dispatch) => {
   const { tr, doc } = state;
   const { searchString, replaceString } = searchReplaceOptions;
-  const textNodeType = state.schema.nodes.text; // this is a node TYPE, not the node itself
 
   let from: number;
   let to: number;
@@ -170,26 +194,7 @@ export const performSearchReplace = (searchReplaceOptions: {
   }
 
   doc.nodesBetween(from, to, (node, pos) => {
-    // apply the change to text nodes only (can also check using Node.isText)
-    if (node.type === textNodeType) {
-      const nodeText = node.text;
-      if (!nodeText) {
-        return;
-      }
-      if (nodeText.includes(searchString)) {
-        const newString = nodeText.replace(
-          RegExp(searchString, 'g'),
-          replaceString,
-        );
-        // create a new node with replaceString (also create a new marks array to ensure immutability)
-        const newNode = state.schema.text(newString, [...node.marks]);
-        // adjust positions (e.g. if replaceString is shorter/longer than searchString)
-        const fromResolved = tr.mapping.map(pos);
-        const toResolved = tr.mapping.map(pos + node.nodeSize);
-        // replace the old node with the new one
-        tr.replaceWith(fromResolved, toResolved, newNode);
-      }
-    }
+    replaceNode(tr, node, searchString, replaceString, pos);
   });
 
   if (dispatch) {
