@@ -4,9 +4,14 @@ import { gapCursor } from 'prosemirror-gapcursor';
 import { EditorPluginListOptions, KeymapPluginType } from '../../types';
 import { Schema } from 'prosemirror-model';
 import { buildInputRules } from './input-rules';
+<<<<<<< HEAD
 import { createTextFormattingPlugin } from './text-formatting';
 import { createTextHighlightingPlugin } from './text-highlighting';
+=======
+>>>>>>> master
 import { Plugin } from 'prosemirror-state';
+import { createTextFormattingPlugin } from './text-formatting';
+import { createTextAlignmentPlugin } from './text-alignment';
 
 const buildKeymap = (schema: Schema): KeymapPluginType => {
   return {
@@ -45,7 +50,8 @@ export const createPluginList = (
      */
     createTextFormattingPlugin(),
 
-    createTextHighlightingPlugin()
+    createTextAlignmentPlugin(),
+    createTextHighlightingPlugin(),
   ];
 
   return plugins;
