@@ -1,5 +1,5 @@
 import { Plugin, PluginKey, StateField, Transaction, EditorState } from 'prosemirror-state';
-import { DecorationSet, Decoration } from 'prosemirror-view';
+import { DecorationSet, Decoration, EditorView } from 'prosemirror-view';
 import { Node } from 'prosemirror-model';
 
 export const pluginKey = new PluginKey('textHighlighting');
@@ -72,7 +72,7 @@ export const createTextHighlightingPlugin = (): Plugin<StateField<
         // - this only happens when the 'Find' button is clicked and the search string is non-empty
         // - tr.docChanged is also needed to trigger the highlighting again after the user modifies the
         //   document, e.g. by typing the word being searched for again
-        if (stringToHighlight || tr.docChanged) {
+        if (stringToHighlight !== null && (stringToHighlight || tr.docChanged)) {
           const decorations: Decoration[] = [];
           const textNodeType = newEditorState.schema.nodes.text; // this is a node TYPE, not the node itself
           newEditorState.doc.nodesBetween(
@@ -111,6 +111,41 @@ export const createTextHighlightingPlugin = (): Plugin<StateField<
       decorations(state) {
         return pluginKey.getState(state).decorationSet;
       },
+      handleClickOn(view: EditorView, pos: number, node: Node, nodePos: number) {
+        const { state, dispatch } = view;
+        const { tr } = state;
+        const {
+          decorationSet,
+          stringToHighlight: searchString,
+          stringToReplace: replaceString,
+        } = pluginKey.getState(state);
+
+        const matchingDecorations = decorationSet.find(pos, pos);
+        if (matchingDecorations.length === 1) {
+          const { from, to } = matchingDecorations[0];
+          state.doc.nodesBetween(from, to, node => {
+            if (
+              !node.isText ||
+              !node.text ||
+              !node.text.includes(searchString)
+            ) {
+              return;
+            }
+            const fromResolved = tr.mapping.map(from);
+            const toResolved = tr.mapping.map(to);
+            // replace only at the clicked position
+            tr.insertText(replaceString, fromResolved, toResolved);
+          });
+
+          if (dispatch) {
+            dispatch(tr);
+          }
+
+          return true;
+        }
+
+        return false;
+      }
     },
   });
 }
