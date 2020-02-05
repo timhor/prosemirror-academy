@@ -126,13 +126,30 @@ export const performFind = (searchOptions: {
   const { tr } = state;
 
   // set metadata in transaction so that the plugin can access the searchString
-  tr.setMeta(textHighlightingPluginKey, searchOptions.searchString);
+  tr.setMeta(textHighlightingPluginKey, {
+    stringToHighlight: searchOptions.searchString,
+  });
 
   if (dispatch) {
     dispatch(tr);
   }
   return true;
 }
+
+export const saveReplaceString = (searchOptions: {
+  stringToReplace: string;
+}): Command => (state, dispatch) => {
+  const { tr } = state;
+
+  tr.setMeta(textHighlightingPluginKey, {
+    stringToReplace: searchOptions.stringToReplace,
+  });
+
+  if (dispatch) {
+    dispatch(tr);
+  }
+  return true;
+};
 
 export const performSearchReplace = (searchReplaceOptions: {
   searchString: string;

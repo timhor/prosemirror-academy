@@ -6,6 +6,7 @@ export const pluginKey = new PluginKey('textHighlighting');
 
 export type TextHighlightingPluginState = {
   stringToHighlight: string | null;
+  stringToReplace: string | null;
 };
 
 const createInlineDecorations = (
@@ -46,14 +47,26 @@ export const createTextHighlightingPlugin = (): Plugin<StateField<
       init() {
         return {
           stringToHighlight: null, // highlight nothing to begin with
+          stringToReplace: null,
           decorationSet: DecorationSet.empty
         };
       },
       apply(tr: Transaction, oldPluginState: TextHighlightingPluginState, _, newEditorState: EditorState) {
-        // fromMetaStringToHighlight is only set on button click, so it would be undefined if the user
-        // types into the document - need to get the string from oldPluginState in that case
-        const fromMetaStringToHighlight = tr.getMeta(pluginKey);
-        const stringToHighlight = fromMetaStringToHighlight || oldPluginState.stringToHighlight;
+        const metaPluginState: TextHighlightingPluginState = tr.getMeta(pluginKey) || {};
+
+        // metaPluginState.stringToHighlight is only set on button click, so it would be undefined if
+        // the user types into the document - need to get the string from oldPluginState in that case
+        const stringToHighlight =
+          metaPluginState.stringToHighlight || oldPluginState.stringToHighlight;
+        const stringToReplace =
+          metaPluginState.stringToReplace || oldPluginState.stringToReplace;
+
+        if (stringToReplace !== oldPluginState.stringToReplace) {
+         return {
+           ...oldPluginState,
+           stringToReplace,
+         };
+        }
 
         // performance optimisations:
         // - this only happens when the 'Find' button is clicked and the search string is non-empty
