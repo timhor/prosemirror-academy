@@ -128,9 +128,7 @@ export const createTextHighlightingPlugin = (): Plugin<StateField<
           stringToReplace,
         } = pluginKey.getState(state);
 
-        performHighlightReplace({decorationSet, stringToHighlight, stringToReplace, pos})(state, dispatch);
-
-        return false;
+        return performHighlightReplace({decorationSet, stringToHighlight, stringToReplace, pos})(state, dispatch);
       }
     },
   });
