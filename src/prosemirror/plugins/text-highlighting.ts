@@ -120,7 +120,7 @@ export const createTextHighlightingPlugin = (): Plugin<StateField<
       decorations(state) {
         return pluginKey.getState(state).decorationSet;
       },
-      handleClickOn(view: EditorView, pos: number, node: Node, nodePos: number) {
+      handleClickOn(view: EditorView, pos: number) {
         const { state, dispatch } = view;
         const {
           decorationSet,
