@@ -5,6 +5,8 @@ import { toggleMark } from 'prosemirror-commands';
 import { Command } from '../../types';
 import { pluginKey as textHighlightingPluginKey } from '../plugins/text-highlighting';
 
+const DEFAULT_TOKEN_SIZE = 2;
+
 // :: (NodeType, ?Object) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
 // Returns a command that tries to set the selected textblocks to the
 // given node type with the given attributes.
@@ -195,11 +197,10 @@ export const performSearchReplace = (searchReplaceOptions: {
   const { tr, doc } = state;
   const { searchString, replaceString } = searchReplaceOptions;
 
-  // currently, an empty doc will have nodeSize - 2 === 2 because of the
-  // opening and closing tags of the paragraph leaf node (the schema
-  // requires at least one leaf node, and the first valid child of a doc
-  // is the paragraph node)
-  if (doc.nodeSize - 2 <= 2) {
+  // this is true for an empty doc because of the opening and closing tags of
+  // the paragraph leaf node (the schema requires at least one leaf node, and
+  // the first valid child of a doc is the paragraph node)
+  if (doc.content.size - DEFAULT_TOKEN_SIZE === 0) {
     return false;
   }
 
@@ -211,7 +212,7 @@ export const performSearchReplace = (searchReplaceOptions: {
   } else {
     // -2 because nodeSize captures the opening and closing tags as well
     // note: can get the same value using doc.content.size
-    [from, to] = [0, doc.nodeSize - 2];
+    [from, to] = [0, doc.nodeSize - DEFAULT_TOKEN_SIZE];
   }
 
   doc.nodesBetween(from, to, (node, pos) => {
