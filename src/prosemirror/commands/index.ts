@@ -1,4 +1,5 @@
 import { Node, NodeType, MarkType } from 'prosemirror-model';
+import { DecorationSet } from 'prosemirror-view';
 import { Transaction } from 'prosemirror-state';
 import { toggleMark } from 'prosemirror-commands';
 import { Command } from '../../types';
@@ -214,3 +215,44 @@ export const performSearchReplace = (searchReplaceOptions: {
 
   return true;
 };
+
+export const performHighlightReplace = (highlightReplaceOptions: {
+  decorationSet: DecorationSet,
+  stringToHighlight: string,
+  stringToReplace: string,
+  pos: number,
+}): Command => (state, dispatch) => {
+  const { tr } = state;
+
+  const {
+    decorationSet,
+    stringToHighlight: searchString,
+    stringToReplace: replaceString,
+    pos
+  } = highlightReplaceOptions;
+
+  const matchingDecorations = decorationSet.find(pos, pos);
+  // either 0 or 1 decorations are expected because the 'range' given
+  // to decorationSet.find is exactly where the user had clicked, so
+  // it can only either be highlighted or not be highlighted
+  if (matchingDecorations.length === 1) {
+    const { from, to } = matchingDecorations[0];
+    state.doc.nodesBetween(from, to, node => {
+      if (!node.isText || !node.text || !node.text.includes(searchString)) {
+        return;
+      }
+      const fromResolved = tr.mapping.map(from);
+      const toResolved = tr.mapping.map(to);
+      // replace only at the clicked position
+      tr.insertText(replaceString, fromResolved, toResolved);
+    });
+
+    if (dispatch) {
+      dispatch(tr);
+    }
+
+    return true;
+  }
+
+  return false;
+}

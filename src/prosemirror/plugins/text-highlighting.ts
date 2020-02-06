@@ -1,6 +1,7 @@
 import { Plugin, PluginKey, StateField, Transaction, EditorState } from 'prosemirror-state';
 import { DecorationSet, Decoration, EditorView } from 'prosemirror-view';
 import { Node } from 'prosemirror-model';
+import { performHighlightReplace } from '../commands';
 
 export const pluginKey = new PluginKey('textHighlighting');
 
@@ -113,36 +114,13 @@ export const createTextHighlightingPlugin = (): Plugin<StateField<
       },
       handleClickOn(view: EditorView, pos: number, node: Node, nodePos: number) {
         const { state, dispatch } = view;
-        const { tr } = state;
         const {
           decorationSet,
-          stringToHighlight: searchString,
-          stringToReplace: replaceString,
+          stringToHighlight,
+          stringToReplace,
         } = pluginKey.getState(state);
 
-        const matchingDecorations = decorationSet.find(pos, pos);
-        if (matchingDecorations.length === 1) {
-          const { from, to } = matchingDecorations[0];
-          state.doc.nodesBetween(from, to, node => {
-            if (
-              !node.isText ||
-              !node.text ||
-              !node.text.includes(searchString)
-            ) {
-              return;
-            }
-            const fromResolved = tr.mapping.map(from);
-            const toResolved = tr.mapping.map(to);
-            // replace only at the clicked position
-            tr.insertText(replaceString, fromResolved, toResolved);
-          });
-
-          if (dispatch) {
-            dispatch(tr);
-          }
-
-          return true;
-        }
+        performHighlightReplace({decorationSet, stringToHighlight, stringToReplace, pos})(state, dispatch);
 
         return false;
       }
