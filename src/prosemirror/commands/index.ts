@@ -207,9 +207,10 @@ export const performSearchReplace = (searchReplaceOptions: {
   let from: number;
   let to: number;
   if (tr.selection.from !== tr.selection.to) {
-    // replace throughout document if nothing is selected
+    // replace only within selection
     [from, to] = [tr.selection.from, tr.selection.to];
   } else {
+    // replace throughout document if nothing is selected
     // -2 because nodeSize captures the opening and closing tags as well
     // note: can get the same value using doc.content.size
     [from, to] = [0, doc.nodeSize - DEFAULT_TOKEN_SIZE];
