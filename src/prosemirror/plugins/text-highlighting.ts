@@ -39,6 +39,30 @@ const createInlineDecorations = (
   return decorations;
 };
 
+const createHighlightDecorations = (newEditorState: EditorState, stringToHighlight: string) => {
+  const decorations: Decoration[] = [];
+  const textNodeType = newEditorState.schema.nodes.text; // this is a node TYPE, not the node itself
+  newEditorState.doc.nodesBetween(
+    0,
+    newEditorState.doc.nodeSize - 2,
+    (node, pos) => {
+      if (node.type !== textNodeType || !node.text) {
+        return;
+      }
+
+      // check for substring instead of exact match because for something like <p>word word match word</p>,
+      // node.text would be 'word word match word'
+      if (node.text.includes(stringToHighlight)) {
+        const inlineDecorations = createInlineDecorations(pos, node, stringToHighlight);
+        if (inlineDecorations) {
+          decorations.push(...inlineDecorations);
+        }
+      }
+    },
+  );
+  return decorations;
+}
+
 export const createTextHighlightingPlugin = (): Plugin<StateField<
   TextHighlightingPluginState
 >> => {
@@ -74,25 +98,9 @@ export const createTextHighlightingPlugin = (): Plugin<StateField<
         // - tr.docChanged is also needed to trigger the highlighting again after the user modifies the
         //   document, e.g. by typing the word being searched for again
         if (stringToHighlight !== null && (stringToHighlight || tr.docChanged)) {
-          const decorations: Decoration[] = [];
-          const textNodeType = newEditorState.schema.nodes.text; // this is a node TYPE, not the node itself
-          newEditorState.doc.nodesBetween(
-            0,
-            newEditorState.doc.nodeSize - 2,
-            (node, pos) => {
-              if (node.type !== textNodeType || !node.text) {
-                return;
-              }
-
-              // check for substring instead of exact match because for something like <p>word word match word</p>,
-              // node.text would be 'word word match word'
-              if (node.text.includes(stringToHighlight)) {
-                const inlineDecorations = createInlineDecorations(pos, node, stringToHighlight);
-                if (inlineDecorations) {
-                  decorations.push(...inlineDecorations);
-                }
-              }
-            },
+          const decorations: Decoration[] = createHighlightDecorations(
+            newEditorState,
+            stringToHighlight,
           );
 
           return {
