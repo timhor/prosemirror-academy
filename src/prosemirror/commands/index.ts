@@ -231,6 +231,10 @@ export const performHighlightReplace = (highlightReplaceOptions: {
     pos
   } = highlightReplaceOptions;
 
+  if (!decorationSet) {
+    return false;
+  }
+
   const matchingDecorations = decorationSet.find(pos, pos);
   // either 0 or 1 decorations are expected because the 'range' given
   // to decorationSet.find is exactly where the user had clicked, so
