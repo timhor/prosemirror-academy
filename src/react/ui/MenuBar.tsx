@@ -135,7 +135,7 @@ const TextAlignmentRightMenuItem = ({
 
 const SearchReplaceMenuItem = ({
   editorView: { state, dispatch },
-}: MenuItem<TextFormattingPluginState>) => {
+}: MenuItem<{}>) => {
   const searchRef = useRef<HTMLInputElement>(document.createElement('input'));
   const replaceRef = useRef<HTMLInputElement>(document.createElement('input'));
 
