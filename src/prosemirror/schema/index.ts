@@ -12,6 +12,7 @@ export const nodes: NodeSpec = {
   // :: NodeSpec The top level document node.
   doc: {
     content: 'block+',
+    marks: 'text_align'
   },
 
   // :: NodeSpec The text node.
@@ -76,10 +77,8 @@ export const nodes: NodeSpec = {
   },
 };
 
-const strongDOM = ['strong', 0];
-
 // :: Object [Specs](#model.MarkSpec) for the marks in the schema.
-export const marks: MarkSpec = {
+export const marks: { [key: string]: MarkSpec } = {
   strong: {
     parseDOM: [
       { tag: 'strong' },
@@ -88,17 +87,26 @@ export const marks: MarkSpec = {
       // tags with a font-weight normal.
       {
         tag: 'b',
-        getAttrs: (node: HTMLElement) =>
-          node.style.fontWeight !== 'normal' && null,
+        getAttrs: (node) => {
+          if (typeof node === 'string') {
+            return null;
+          }
+          return (node as HTMLElement).style.fontWeight !== 'normal' && null;
+        },
+
       },
       {
         style: 'font-weight',
-        getAttrs: (value: string) =>
-          /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null,
+        getAttrs: (value) => {
+          if (typeof value === 'string') {
+            return /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null;
+          }
+          return null;
+        }
       },
     ],
     toDOM() {
-      return strongDOM;
+      return ['strong', 0];
     },
   },
 
@@ -108,6 +116,19 @@ export const marks: MarkSpec = {
       return ['em', 0];
     },
   },
+
+  text_align: {
+    attrs: {
+      alignment: {
+        default: null
+      }
+    },
+    parseDOM: [{ tag: 'div.text-align' }],
+    toDOM(mark) {
+      const alignment = mark.attrs.alignment;
+      return ['div', { class: `text-align text-align__${alignment}` }, 0];
+    }
+  }
 };
 
 // :: Schema

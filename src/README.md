@@ -8,13 +8,13 @@ If you create a new plugin, you probably added the PluginState type on `src/type
 
 - PluginState
 
-```
+```js
 export type PluginState = TextFormattingPluginState | YourNewPluginState
 ```
 
 - EditorPluginStates
 
-```
+```js
 export type EditorPluginStates = {
   // [...]
   yourNewPluginName: YourNewPluginState
@@ -25,7 +25,7 @@ Using this code, we will be able to access any plugin state from MenuBar and let
 
 Next, you can go to MenuBar component and uses your new plugin state:
 
-```
+```js
 const MenuBar = ({ editorView, editorPluginStates }: MenuBarProps) => {
   const { yourNewPluginName } = editorPluginStates;
 

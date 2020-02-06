@@ -96,7 +96,7 @@ const App = () => {
    *
    * Please do not add anything inside of it because
    * React will try to control the re-render,
-   * then you can end up in an infinite loop os renders.
+   * then you can end up in an infinite loop of renders.
    *
    * To make our lives easier,
    * we are using some default CSS coming from Prosemirror code.

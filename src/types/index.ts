@@ -7,10 +7,14 @@ export type TextFormattingPluginState = {
   strongActive: boolean;
   headingActive: number | null;
 };
-export type PluginState = TextFormattingPluginState;
+export type TextAlignmentPluginState = {
+  alignmentDisabled: boolean;
+}
+export type PluginState = TextFormattingPluginState & TextAlignmentPluginState;
 
 export type EditorPluginStates = {
   textFormattingPluginState?: TextFormattingPluginState;
+  textAlignmentPluginState?: TextAlignmentPluginState;
 };
 
 export type EditorPluginListOptions = {

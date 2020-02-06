@@ -1,4 +1,4 @@
-import { NodeType } from 'prosemirror-model';
+import { NodeType, Node, MarkType } from 'prosemirror-model';
 import { toggleMark } from 'prosemirror-commands';
 import { Command } from '../../types';
 
@@ -73,3 +73,55 @@ export const createHeading = (level: number): Command => (state, dispatch) => {
 
   return setBlockTypeInSelection(heading, { level })(state, dispatch);
 };
+
+// https://stackoverflow.com/a/58110124
+function nonNullable<T>(value: T): value is NonNullable<T> {
+  return value !== null && value !== undefined;
+}
+
+export const toggleTextAlignment = (alignment: 'left' | 'centre' | 'right'): Command => (state, dispatch) => {
+  const doc = state.doc;
+  const selection = state.selection;
+  const tr = state.tr; // only do this once at the beginning as accessing state.tr creates a new transaction
+
+  const textAlignmentMarkType: MarkType = state.schema.marks.text_align;
+  doc.nodesBetween(selection.from, selection.to, (node, pos) => {
+    if (node.type.name === 'paragraph' || node.type.name === 'heading') {
+      const marks = node.marks
+        .map(mark => {
+          if (mark.type !== textAlignmentMarkType) {
+            return mark;
+          }
+          return null;
+        })
+        .filter(nonNullable);
+
+      if (alignment !== 'left') {
+        marks.push(textAlignmentMarkType.create({ alignment }));
+      }
+
+      tr.setNodeMarkup(
+        pos,
+        undefined,
+        undefined,
+        marks,
+      );
+
+      return false;
+    }
+  });
+
+  // if there is no change in the transaction, it is the same as checking for a code block
+  // because the document could not have been modified unless the selection is in a paragraph
+  // or heading (that validation is already done in the nodesBetween callback above)
+  // [note: it is an anti-pattern to return false after dispatch]
+  if (!tr.docChanged) {
+    return false;
+  }
+
+  if (dispatch) {
+    dispatch(tr);
+  }
+
+  return true;
+}
