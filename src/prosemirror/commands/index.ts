@@ -195,6 +195,14 @@ export const performSearchReplace = (searchReplaceOptions: {
   const { tr, doc } = state;
   const { searchString, replaceString } = searchReplaceOptions;
 
+  // currently, an empty doc will have nodeSize - 2 === 2 because of the
+  // opening and closing tags of the paragraph leaf node (the schema
+  // requires at least one leaf node, and the first valid child of a doc
+  // is the paragraph node)
+  if (doc.nodeSize - 2 <= 2) {
+    return false;
+  }
+
   let from: number;
   let to: number;
   if (tr.selection.from !== tr.selection.to) {
@@ -209,6 +217,10 @@ export const performSearchReplace = (searchReplaceOptions: {
   doc.nodesBetween(from, to, (node, pos) => {
     replaceNode({ tr, node, searchString, replaceString, pos });
   });
+
+  if (!tr.docChanged) {
+    return false;
+  }
 
   if (dispatch) {
     dispatch(tr);
