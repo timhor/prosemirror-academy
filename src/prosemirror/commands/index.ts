@@ -202,6 +202,7 @@ export const performSearchReplace = (searchReplaceOptions: {
     [from, to] = [tr.selection.from, tr.selection.to];
   } else {
     // -2 because nodeSize captures the opening and closing tags as well
+    // note: can get the same value using doc.content.size
     [from, to] = [0, doc.nodeSize - 2];
   }
 
