@@ -67,3 +67,9 @@ code {
 .text-align__right {
   text-align: right;
 }
+
+.text-highlight {
+  cursor: pointer;
+  font-weight: inherit; /* retain existing bold text, otherwise remove default styling from <strong> */
+  background-color: yellow;
+}
