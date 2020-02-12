@@ -1,11 +1,14 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { EditorView } from 'prosemirror-view';
 import { EditorContextType, TextFormattingPluginState, TextAlignmentPluginState } from '../../types';
 import {
   toggleStrongMark,
   createCodeBlock,
   createHeading,
-  toggleTextAlignment
+  toggleTextAlignment,
+  performSearchReplace,
+  performFind,
+  saveReplaceString,
 } from '../../prosemirror/commands';
 
 type MenuBarProps = EditorContextType & {
@@ -130,6 +133,58 @@ const TextAlignmentRightMenuItem = ({
   );
 };
 
+const SearchReplaceMenuItem = ({
+  editorView: { state, dispatch },
+}: MenuItem<{}>) => {
+  const searchRef = useRef<HTMLInputElement>(document.createElement('input'));
+  const replaceRef = useRef<HTMLInputElement>(document.createElement('input'));
+
+  const onFind = useCallback(() => {
+    const searchInput = searchRef.current;
+
+    if (!searchInput) {
+      // ensure input field exists
+      return;
+    }
+
+    performFind({
+      searchString: searchInput.value
+    })(state, dispatch);
+  }, [state, dispatch]);
+
+  const onClick = useCallback(() => {
+    const searchInput = searchRef.current;
+    const replaceInput = replaceRef.current;
+
+    if (!searchInput || !replaceInput) {
+      // ensure both input fields exist
+      return;
+    }
+
+    performSearchReplace({
+      searchString: searchInput.value,
+      replaceString: replaceInput.value,
+    })(state, dispatch);
+  }, [state, dispatch]);
+
+  const onBlur = useCallback(() => {
+    const replaceInput = replaceRef.current;
+    if (!replaceInput) {
+      return;
+    }
+    saveReplaceString({ stringToReplace: replaceInput.value })(state, dispatch);
+  }, [state, dispatch]);
+
+  return (
+    <div>
+      <input type="text" placeholder="Search" ref={searchRef} />
+      <button onClick={onFind}>Find</button>
+      <input type="text" placeholder="Replace" onBlur={onBlur} ref={replaceRef} />
+      <button onClick={onClick}>Perform Replacement</button>
+    </div>
+  );
+};
+
 const MenuBar = ({ editorView, editorPluginStates }: MenuBarProps) => {
   const { textFormattingPluginState, textAlignmentPluginState } = editorPluginStates;
 
@@ -170,6 +225,9 @@ const MenuBar = ({ editorView, editorPluginStates }: MenuBarProps) => {
       <TextAlignmentRightMenuItem
         editorView={editorView}
         pluginState={textAlignmentPluginState}
+      />
+      <SearchReplaceMenuItem
+        editorView={editorView}
       />
     </div>
   );

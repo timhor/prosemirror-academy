@@ -1,6 +1,11 @@
-import { NodeType, Node, MarkType } from 'prosemirror-model';
+import { Node, NodeType, MarkType } from 'prosemirror-model';
+import { DecorationSet } from 'prosemirror-view';
+import { Transaction } from 'prosemirror-state';
 import { toggleMark } from 'prosemirror-commands';
 import { Command } from '../../types';
+import { pluginKey as textHighlightingPluginKey } from '../plugins/text-highlighting';
+
+const DEFAULT_TOKEN_SIZE = 2;
 
 // :: (NodeType, ?Object) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
 // Returns a command that tries to set the selected textblocks to the
@@ -124,4 +129,149 @@ export const toggleTextAlignment = (alignment: 'left' | 'centre' | 'right'): Com
   }
 
   return true;
+}
+
+export const performFind = (searchOptions: {
+  searchString: string;
+}): Command => (state, dispatch) => {
+  const { tr } = state;
+
+  // set metadata in transaction so that the plugin can access the searchString
+  tr.setMeta(textHighlightingPluginKey, {
+    stringToHighlight: searchOptions.searchString,
+  });
+
+  if (dispatch) {
+    dispatch(tr);
+  }
+
+  return true;
+}
+
+export const saveReplaceString = (searchOptions: {
+  stringToReplace: string;
+}): Command => (state, dispatch) => {
+  const { tr } = state;
+
+  tr.setMeta(textHighlightingPluginKey, {
+    stringToReplace: searchOptions.stringToReplace,
+  });
+
+  if (dispatch) {
+    dispatch(tr);
+  }
+
+  return true;
+};
+
+const replaceNode = (replaceOptions: {
+  tr: Transaction,
+  node: Node,
+  searchString: string,
+  replaceString: string,
+  pos: number,
+}) => {
+  const { tr, node, searchString, replaceString, pos } = replaceOptions;
+
+  // apply the change to text nodes only
+  if (!node.isText || !node.text || !node.text.includes(searchString)) {
+    return;
+  }
+
+  // adjust positions (e.g. if replaceString is shorter/longer than searchString)
+  const fromResolved = tr.mapping.map(pos);
+  const toResolved = tr.mapping.map(pos + node.nodeSize);
+  const newString = node.text.replace(RegExp(searchString, 'g'), replaceString);
+
+  // create a new node with replaceString (also create a new marks array to ensure immutability)
+  const newNode = node.type.schema.text(newString, [...node.marks]);
+
+  // replace the old node with the new one
+  tr.replaceWith(fromResolved, toResolved, newNode);
+};
+
+export const performSearchReplace = (searchReplaceOptions: {
+  searchString: string;
+  replaceString: string;
+}): Command => (state, dispatch) => {
+  const { tr, doc } = state;
+  const { searchString, replaceString } = searchReplaceOptions;
+
+  // this is true for an empty doc because of the opening and closing tags of
+  // the paragraph leaf node (the schema requires at least one leaf node, and
+  // the first valid child of a doc is the paragraph node)
+  if (doc.content.size - DEFAULT_TOKEN_SIZE === 0) {
+    return false;
+  }
+
+  let from: number;
+  let to: number;
+  if (tr.selection.from !== tr.selection.to) {
+    // replace only within selection
+    [from, to] = [tr.selection.from, tr.selection.to];
+  } else {
+    // replace throughout document if nothing is selected
+    // -2 because nodeSize captures the opening and closing tags as well
+    // note: can get the same value using doc.content.size
+    [from, to] = [0, doc.nodeSize - DEFAULT_TOKEN_SIZE];
+  }
+
+  doc.nodesBetween(from, to, (node, pos) => {
+    replaceNode({ tr, node, searchString, replaceString, pos });
+  });
+
+  if (!tr.docChanged) {
+    return false;
+  }
+
+  if (dispatch) {
+    dispatch(tr);
+  }
+
+  return true;
+};
+
+export const performHighlightReplace = (highlightReplaceOptions: {
+  decorationSet: DecorationSet,
+  stringToHighlight: string,
+  stringToReplace: string,
+  pos: number,
+}): Command => (state, dispatch) => {
+  const { tr } = state;
+
+  const {
+    decorationSet,
+    stringToHighlight: searchString,
+    stringToReplace: replaceString,
+    pos
+  } = highlightReplaceOptions;
+
+  if (!decorationSet) {
+    return false;
+  }
+
+  const matchingDecorations = decorationSet.find(pos, pos);
+  // either 0 or 1 decorations are expected because the 'range' given
+  // to decorationSet.find is exactly where the user had clicked, so
+  // it can only either be highlighted or not be highlighted
+  if (matchingDecorations.length === 1) {
+    const { from, to } = matchingDecorations[0];
+    state.doc.nodesBetween(from, to, node => {
+      if (!node.isText || !node.text || !node.text.includes(searchString)) {
+        return;
+      }
+      const fromResolved = tr.mapping.map(from);
+      const toResolved = tr.mapping.map(to);
+      // replace only at the clicked position
+      tr.insertText(replaceString, fromResolved, toResolved);
+    });
+
+    if (dispatch) {
+      dispatch(tr);
+    }
+
+    return true;
+  }
+
+  return false;
 }

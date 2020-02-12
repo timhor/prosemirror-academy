@@ -7,6 +7,7 @@ import { buildInputRules } from './input-rules';
 import { Plugin } from 'prosemirror-state';
 import { createTextFormattingPlugin } from './text-formatting';
 import { createTextAlignmentPlugin } from './text-alignment';
+import { createTextHighlightingPlugin } from './text-highlighting';
 
 const buildKeymap = (schema: Schema): KeymapPluginType => {
   return {
@@ -44,7 +45,9 @@ export const createPluginList = (
      * If you want to understand what a plugin is, (check this file)[src/prosemirror/plugins/README.md]
      */
     createTextFormattingPlugin(),
+
     createTextAlignmentPlugin(),
+    createTextHighlightingPlugin(),
   ];
 
   return plugins;
