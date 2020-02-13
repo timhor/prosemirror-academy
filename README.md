@@ -2,7 +2,7 @@
 
 Welcome to Prosemirror Academy codebase. This repository is 100% designed for the Editor Team to teach developers how ProseMirror works.
 
-You can find more information about the project here: [Editor Academy](go/editor-academy)
+You can find more information about the project here: [Editor Academy](http://go/editor-academy)
 
 ## What you need to have in your computer to run this project
 
