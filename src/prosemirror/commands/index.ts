@@ -1,4 +1,4 @@
-import { NodeType, Node, MarkType } from 'prosemirror-model';
+import { NodeType, MarkType } from 'prosemirror-model';
 import { toggleMark } from 'prosemirror-commands';
 import { Command } from '../../types';
 
