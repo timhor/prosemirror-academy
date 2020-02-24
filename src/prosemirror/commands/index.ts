@@ -175,7 +175,7 @@ const replaceNode = (replaceOptions: {
 
   // apply the change to text nodes only
   if (!node.isText || !node.text || !node.text.includes(searchString)) {
-    return;
+    return false;
   }
 
   // adjust positions (e.g. if replaceString is shorter/longer than searchString)
@@ -188,6 +188,8 @@ const replaceNode = (replaceOptions: {
 
   // replace the old node with the new one
   tr.replaceWith(fromResolved, toResolved, newNode);
+
+  return true;
 };
 
 export const performSearchReplace = (searchReplaceOptions: {
@@ -217,7 +219,7 @@ export const performSearchReplace = (searchReplaceOptions: {
   }
 
   doc.nodesBetween(from, to, (node, pos) => {
-    replaceNode({ tr, node, searchString, replaceString, pos });
+    return replaceNode({ tr, node, searchString, replaceString, pos });
   });
 
   if (!tr.docChanged) {
