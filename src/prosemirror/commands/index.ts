@@ -79,7 +79,9 @@ function nonNullable<T>(value: T): value is NonNullable<T> {
   return value !== null && value !== undefined;
 }
 
-export const toggleTextAlignment = (alignment: 'left' | 'centre' | 'right'): Command => (state, dispatch) => {
+export const toggleTextAlignment = (
+  alignment: 'left' | 'centre' | 'right',
+): Command => (state, dispatch) => {
   const doc = state.doc;
   const selection = state.selection;
   const tr = state.tr; // only do this once at the beginning as accessing state.tr creates a new transaction
@@ -100,12 +102,7 @@ export const toggleTextAlignment = (alignment: 'left' | 'centre' | 'right'): Com
         marks.push(textAlignmentMarkType.create({ alignment }));
       }
 
-      tr.setNodeMarkup(
-        pos,
-        undefined,
-        undefined,
-        marks,
-      );
+      tr.setNodeMarkup(pos, undefined, undefined, marks);
 
       return false;
     }
@@ -124,4 +121,4 @@ export const toggleTextAlignment = (alignment: 'left' | 'centre' | 'right'): Com
   }
 
   return true;
-}
+};

@@ -12,7 +12,7 @@ export const nodes: { [key: string]: NodeSpec } = {
   // :: NodeSpec The top level document node.
   doc: {
     content: 'block+',
-    marks: 'text_align'
+    marks: 'text_align',
   },
 
   // :: NodeSpec The text node.
@@ -119,15 +119,15 @@ export const marks: { [key: string]: MarkSpec } = {
   text_align: {
     attrs: {
       alignment: {
-        default: null
-      }
+        default: null,
+      },
     },
     parseDOM: [{ tag: 'div.text-align' }],
     toDOM(mark) {
       const alignment = mark.attrs.alignment;
       return ['div', { class: `text-align text-align__${alignment}` }, 0];
-    }
-  }
+    },
+  },
 };
 
 // :: Schema

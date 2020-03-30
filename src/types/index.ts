@@ -9,7 +9,7 @@ export type TextFormattingPluginState = {
 };
 export type TextAlignmentPluginState = {
   alignmentDisabled: boolean;
-}
+};
 export type PluginState = TextFormattingPluginState & TextAlignmentPluginState;
 
 export type EditorPluginStates = {
