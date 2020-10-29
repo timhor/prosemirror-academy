@@ -10,9 +10,9 @@ import { TextAlignmentPluginState } from '../../types';
 
 export const pluginKey = new PluginKey('textAlignment');
 
-export const createTextAlignmentPlugin = (): Plugin<StateField<
-  TextAlignmentPluginState
->> => {
+export const createTextAlignmentPlugin = (): Plugin<
+  StateField<TextAlignmentPluginState>
+> => {
   return new Plugin({
     key: pluginKey,
     state: {

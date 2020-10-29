@@ -17,7 +17,7 @@ export const buildEditorPluginStates = (
   plugins: Array<Plugin>,
 ): EditorPluginStates => {
   const pluginStates = plugins
-    .map(plugin => {
+    .map((plugin) => {
       if (plugin.spec.key instanceof PluginKey) {
         return plugin;
       }

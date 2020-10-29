@@ -2,8 +2,11 @@
 import {
   Schema,
   NodeSpec,
+  Mark,
   MarkSpec,
+  DOMOutputSpec,
   Node as ProseMirrorNode,
+  MarkType,
 } from 'prosemirror-model';
 
 // :: Object
@@ -26,7 +29,7 @@ export const nodes: { [key: string]: NodeSpec } = {
     content: 'inline*',
     group: 'block',
     parseDOM: [{ tag: 'p' }],
-    toDOM() {
+    toDOM(): DOMOutputSpec {
       return ['p', 0];
     },
   },
@@ -45,7 +48,7 @@ export const nodes: { [key: string]: NodeSpec } = {
       { tag: 'h2', attrs: { level: 2 } },
       { tag: 'h3', attrs: { level: 3 } },
     ],
-    toDOM(node: ProseMirrorNode) {
+    toDOM(node: ProseMirrorNode): DOMOutputSpec {
       return ['h' + node.attrs.level, 0];
     },
   },
@@ -60,7 +63,7 @@ export const nodes: { [key: string]: NodeSpec } = {
     code: true,
     defining: true,
     parseDOM: [{ tag: 'pre', preserveWhitespace: 'full' }],
-    toDOM() {
+    toDOM(): DOMOutputSpec {
       return ['pre', ['code', 0]];
     },
   },
@@ -71,7 +74,7 @@ export const nodes: { [key: string]: NodeSpec } = {
     group: 'inline',
     selectable: false,
     parseDOM: [{ tag: 'br' }],
-    toDOM() {
+    toDOM(): DOMOutputSpec {
       return ['br'];
     },
   },
@@ -87,7 +90,7 @@ export const marks: { [key: string]: MarkSpec } = {
       // tags with a font-weight normal.
       {
         tag: 'b',
-        getAttrs: node => {
+        getAttrs: (node: Node | string): false | null => {
           if (typeof node === 'string') {
             return null;
           }
@@ -96,7 +99,7 @@ export const marks: { [key: string]: MarkSpec } = {
       },
       {
         style: 'font-weight',
-        getAttrs: value => {
+        getAttrs: (value: Node | string): false | null => {
           if (typeof value === 'string') {
             return /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null;
           }
@@ -104,14 +107,14 @@ export const marks: { [key: string]: MarkSpec } = {
         },
       },
     ],
-    toDOM() {
+    toDOM(): DOMOutputSpec {
       return ['strong', 0];
     },
   },
 
   em: {
     parseDOM: [{ tag: 'i' }, { tag: 'em' }, { style: 'font-style=italic' }],
-    toDOM() {
+    toDOM(): DOMOutputSpec {
       return ['em', 0];
     },
   },
@@ -123,7 +126,7 @@ export const marks: { [key: string]: MarkSpec } = {
       },
     },
     parseDOM: [{ tag: 'div.text-align' }],
-    toDOM(mark) {
+    toDOM(mark: Mark): DOMOutputSpec {
       const alignment = mark.attrs.alignment;
       return ['div', { class: `text-align text-align__${alignment}` }, 0];
     },

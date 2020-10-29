@@ -11,9 +11,9 @@ import { isMarkActive } from '../utils';
 
 export const pluginKey = new PluginKey('textFormatting');
 
-export const createTextFormattingPlugin = (): Plugin<StateField<
-  TextFormattingPluginState
->> => {
+export const createTextFormattingPlugin = (): Plugin<
+  StateField<TextFormattingPluginState>
+> => {
   return new Plugin({
     key: pluginKey,
     state: {

@@ -7,7 +7,7 @@ import { Command } from '../../types';
 // given node type with the given attributes.
 const setBlockTypeInSelection = (
   nodeType: NodeType,
-  attrs: object,
+  attrs: { [key: string]: any },
 ): Command => (state, dispatch) => {
   const { from, to } = state.selection;
   let applicable = false;
@@ -90,7 +90,7 @@ export const toggleTextAlignment = (
   doc.nodesBetween(selection.from, selection.to, (node, pos) => {
     if (node.type.name === 'paragraph' || node.type.name === 'heading') {
       const marks = node.marks
-        .map(mark => {
+        .map((mark) => {
           if (mark.type !== textAlignmentMarkType) {
             return mark;
           }

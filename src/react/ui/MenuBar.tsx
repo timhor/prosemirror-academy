@@ -125,7 +125,10 @@ const TextAlignmentRightMenuItem = ({
   );
 };
 
-const MenuBar = ({ editorView, editorPluginStates }: MenuBarProps) => {
+const MenuBar: React.FC<MenuBarProps> = ({
+  editorView,
+  editorPluginStates,
+}) => {
   const {
     textFormattingPluginState,
     textAlignmentPluginState,

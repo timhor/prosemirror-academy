@@ -1,4 +1,9 @@
 module.exports = {
+  env: {
+    browser: true,
+    amd: true,
+    node: true,
+  },
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2018,
@@ -17,6 +22,7 @@ module.exports = {
   ],
   rules: {
     indent: 'off',
+    'react/prop-types': 'off',
     '@typescript-eslint/indent': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-var-requires': 'off',
