@@ -78,6 +78,10 @@ export const nodes: { [key: string]: NodeSpec } = {
       return ['br'];
     },
   },
+
+  flow: {
+    group: 'block',
+  },
 };
 
 // :: Object [Specs](#model.MarkSpec) for the marks in the schema.

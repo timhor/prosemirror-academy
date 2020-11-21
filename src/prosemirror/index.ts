@@ -2,6 +2,8 @@ import { createPluginList } from './plugins';
 import { schema } from './schema';
 import { EditorState, Plugin } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
+import { Node as PMNode } from 'prosemirror-model';
+import { view as flow } from './nodes-views/flow';
 
 type InitProseMirrorEditorViewOptions = {
   onInitEditorView: (
@@ -13,6 +15,43 @@ type InitProseMirrorEditorViewOptions = {
     plugins: Array<Plugin>,
   ) => void;
 };
+
+const docJSON = {
+  type: 'doc',
+  content: [
+    {
+      type: 'paragraph',
+      content: [
+        {
+          type: 'text',
+          text: 'One',
+        },
+      ],
+    },
+    {
+      type: 'flow',
+    },
+    {
+      type: 'paragraph',
+      content: [
+        {
+          type: 'text',
+          text: 'two',
+        },
+      ],
+    },
+    {
+      type: 'paragraph',
+      content: [
+        {
+          type: 'text',
+          text: 'three',
+        },
+      ],
+    },
+  ],
+};
+const doc: PMNode = PMNode.fromJSON(schema, docJSON);
 
 /**
  * The plugin list needs to be defined before we mount the EditorView.
@@ -45,7 +84,11 @@ export const initProseMirrorEditorView = (
     state: EditorState.create({
       plugins,
       schema,
+      doc,
     }),
+    nodeViews: {
+      flow,
+    },
     /**
      * We are overriding the native dispatch function
      * because we will sync the Prosemiror plugin states
