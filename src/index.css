@@ -35,6 +35,11 @@ body {
   font-weight: bold;
 }
 
+.flow {
+  height: 300px;
+  border: 1px solid rgb(197, 203, 210);
+}
+
 pre {
   font-family: 'Courier 10 Pitch', Courier, monospace;
   font-size: 95%;
@@ -66,4 +71,8 @@ code {
 
 .text-align__right {
   text-align: right;
+}
+
+figure {
+  margin: 0;
 }
