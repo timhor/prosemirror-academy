@@ -81,6 +81,46 @@ export const nodes: { [key: string]: NodeSpec } = {
 
   flow: {
     group: 'block',
+    content: 'flow_content*',
+  },
+
+  flow_node: {
+    group: 'flow_content',
+    inline: true,
+    selectable: true,
+    attrs: {
+      id: {
+        default: -1,
+      },
+      data: {
+        default: {
+          label: 'Default Label',
+        },
+      },
+      position: {
+        default: {
+          x: -1,
+          y: -1,
+        },
+      },
+    },
+  },
+
+  flow_connection: {
+    group: 'flow_content',
+    inline: true,
+    selectable: true,
+    attrs: {
+      id: {
+        default: '',
+      },
+      source: {
+        default: '',
+      },
+      target: {
+        default: '',
+      },
+    },
   },
 };
 

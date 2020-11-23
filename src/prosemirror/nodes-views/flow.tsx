@@ -4,23 +4,29 @@ import ReactFlow, {
   Background,
   BackgroundVariant,
   OnLoadParams,
+  Elements as FlowElements,
 } from 'react-flow-renderer';
 import { Node as PMNode } from 'prosemirror-model';
 import { EditorView, Decoration, NodeView } from 'prosemirror-view';
 
-const elements = [
-  { id: '1', data: { label: 'Node 1' }, position: { x: 250, y: 5 } },
-  // you can also pass a React component as a label
-  { id: '2', data: { label: <div>Node 2</div> }, position: { x: 100, y: 100 } },
-  { id: 'e1-2', source: '1', target: '2', animated: true },
-];
+type MutationSelection = {
+  type: 'selection';
+  target: Element;
+};
+
+type ElementAttributes = {
+  [keyof: string]: any;
+};
+
+type BasicFlowProps = {
+  elements: FlowElements;
+};
 
 const onLoad = (instance: OnLoadParams) => {
-  console.log(instance);
   instance.fitView();
 };
 
-const BasicFlow = () => (
+const BasicFlow: React.FC<BasicFlowProps> = ({ elements }) => (
   <ReactFlow
     onLoad={onLoad}
     snapToGrid={true}
@@ -32,19 +38,28 @@ const BasicFlow = () => (
   </ReactFlow>
 );
 
-type MutationSelection = {
-  type: 'selection';
-  target: Element;
+const convertElementAttrs = (elements: ElementAttributes): FlowElements => {
+  return elements as FlowElements;
 };
 
 class FlowView implements NodeView {
   dom: HTMLElement;
 
   constructor(node: PMNode, view: EditorView) {
+    const elements: ElementAttributes = [];
+    node.forEach((childNode: PMNode) => {
+      const elementAttrs = {
+        ...childNode.attrs,
+      };
+      elements.push(elementAttrs);
+    });
     this.dom = document.createElement('figure');
     this.dom.classList.add('flow');
 
-    ReactDOM.render(<BasicFlow />, this.dom);
+    ReactDOM.render(
+      <BasicFlow elements={convertElementAttrs(elements)} />,
+      this.dom,
+    );
   }
 
   update(node: PMNode) {

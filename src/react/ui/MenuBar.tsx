@@ -12,6 +12,7 @@ import {
   createHeading,
   toggleTextAlignment,
   createFlowBlock,
+  addFlowElement,
 } from '../../prosemirror/commands';
 
 type MenuBarProps = EditorContextType & {
@@ -138,6 +139,21 @@ const TextAlignmentRightMenuItem = ({
   );
 };
 
+const FlowAddElementMenuItem = ({
+  editorView: { state, dispatch },
+}: MenuItem<unknown>) => {
+  const onClick = useCallback(() => {
+    console.log('add element');
+    addFlowElement()(state, dispatch);
+  }, [state, dispatch]);
+
+  return (
+    <button disabled={false} onClick={onClick}>
+      ADD ELEMENT
+    </button>
+  );
+};
+
 const MenuBar: React.FC<MenuBarProps> = ({
   editorView,
   editorPluginStates,
@@ -191,6 +207,7 @@ const MenuBar: React.FC<MenuBarProps> = ({
         editorView={editorView}
         pluginState={textAlignmentPluginState}
       />
+      <FlowAddElementMenuItem editorView={editorView} />
     </div>
   );
 };
