@@ -143,7 +143,8 @@ export const addFlowElement = (): Command => (state, dispatch) => {
 
   if (dispatch) {
     dispatch(tr);
+    return true;
   }
 
-  return true;
+  return false;
 };
