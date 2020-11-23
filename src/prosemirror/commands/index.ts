@@ -64,6 +64,15 @@ export const createCodeBlock = (): Command => (state, dispatch) => {
   return setBlockTypeInSelection(code_block, {})(state, dispatch);
 };
 
+export const createFlowBlock = (): Command => (state, dispatch) => {
+  const { tr, selection, schema } = state;
+  if (dispatch) {
+    dispatch(tr.insert(selection.from, schema.nodes.flow.createChecked({})));
+    return true;
+  }
+  return false;
+};
+
 export const createHeading = (level: number): Command => (state, dispatch) => {
   const {
     schema: {
