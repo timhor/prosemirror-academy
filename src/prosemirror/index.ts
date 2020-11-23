@@ -30,6 +30,42 @@ const docJSON = {
     },
     {
       type: 'flow',
+      content: [
+        {
+          type: 'flow_node',
+          attrs: {
+            id: '1',
+            data: {
+              label: 'Node 1',
+            },
+            position: {
+              x: 250,
+              y: 5,
+            },
+          },
+        },
+        {
+          type: 'flow_node',
+          attrs: {
+            id: '2',
+            data: {
+              label: 'Node 2',
+            },
+            position: {
+              x: 100,
+              y: 100,
+            },
+          },
+        },
+        {
+          type: 'flow_connection',
+          attrs: {
+            id: 'e1-2',
+            source: '1',
+            target: '2',
+          },
+        },
+      ],
     },
     {
       type: 'paragraph',

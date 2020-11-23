@@ -131,3 +131,19 @@ export const toggleTextAlignment = (
 
   return true;
 };
+
+export const addFlowElement = (): Command => (state, dispatch) => {
+  const doc = state.doc;
+  const selection = state.selection;
+  const tr = state.tr; // only do this once at the beginning as accessing state.tr creates a new transaction
+
+  if (!tr.docChanged) {
+    return false;
+  }
+
+  if (dispatch) {
+    dispatch(tr);
+  }
+
+  return true;
+};
