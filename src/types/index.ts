@@ -12,9 +12,14 @@ export type TextAlignmentPluginState = {
 };
 export type PluginState = TextFormattingPluginState & TextAlignmentPluginState;
 
+export type FlowPluginState = {
+  content?: any;
+};
+
 export type EditorPluginStates = {
   textFormattingPluginState?: TextFormattingPluginState;
   textAlignmentPluginState?: TextAlignmentPluginState;
+  flowPluginState?: FlowPluginState;
 };
 
 export type EditorPluginListOptions = {

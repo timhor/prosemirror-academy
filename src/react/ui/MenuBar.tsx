@@ -4,12 +4,14 @@ import {
   EditorContextType,
   TextFormattingPluginState,
   TextAlignmentPluginState,
+  FlowPluginState,
 } from '../../types';
 import {
   toggleStrongMark,
   createCodeBlock,
   createHeading,
   toggleTextAlignment,
+  createFlowBlock,
 } from '../../prosemirror/commands';
 
 type MenuBarProps = EditorContextType & {
@@ -51,6 +53,17 @@ const CodeBlockMenuItem = ({
   }, [state, dispatch]);
 
   return <button onClick={onClick}>Code Block</button>;
+};
+
+const FlowBlockMenuItem = ({
+  editorView: { state, dispatch },
+  pluginState,
+}: MenuItem<FlowPluginState>) => {
+  const onClick = useCallback(() => {
+    createFlowBlock()(state, dispatch);
+  }, [state, dispatch]);
+
+  return <button onClick={onClick}>Diagram</button>;
 };
 
 const HeadingMenuItem = ({
@@ -132,6 +145,7 @@ const MenuBar: React.FC<MenuBarProps> = ({
   const {
     textFormattingPluginState,
     textAlignmentPluginState,
+    flowPluginState,
   } = editorPluginStates;
 
   return (
@@ -143,6 +157,11 @@ const MenuBar: React.FC<MenuBarProps> = ({
       <CodeBlockMenuItem
         editorView={editorView}
         pluginState={textFormattingPluginState}
+      />
+
+      <FlowBlockMenuItem
+        editorView={editorView}
+        pluginState={flowPluginState}
       />
 
       <HeadingMenuItem
